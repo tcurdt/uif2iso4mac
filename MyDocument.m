@@ -228,6 +228,13 @@
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
 
     [pool release];
+
+}
+
+- (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType
+{
+    [self setFileName:fileName];
+    return YES;
 }
 
 - (NSData *)dataRepresentationOfType:(NSString *)aType

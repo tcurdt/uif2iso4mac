@@ -32,4 +32,5 @@
 
     IBOutlet NSProgressIndicator *ProgressIndicator;
 }
+
 @end
