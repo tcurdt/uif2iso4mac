@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'uif2iso' target in the 'uif2iso' project
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif
