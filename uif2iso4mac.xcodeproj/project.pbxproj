@@ -44,7 +44,7 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D15AC370486D014006FF6A4 /* uif2iso.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uif2iso.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D15AC370486D014006FF6A4 /* uif2iso4mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uif2iso4mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D6174670D808D0100279899 /* App.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = App.icns; sourceTree = SOURCE_ROOT; };
 		9D72593D0D99CC7B00326CAF /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = Sources/AppController.h; sourceTree = SOURCE_ROOT; };
 		9D72593E0D99CC7B00326CAF /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppController.m; path = Sources/AppController.m; sourceTree = SOURCE_ROOT; };
@@ -90,7 +90,7 @@
 		19C28FB0FE9D524F11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D15AC370486D014006FF6A4 /* uif2iso.app */,
+				8D15AC370486D014006FF6A4 /* uif2iso4mac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -170,7 +170,7 @@
 			name = uif2iso4mac;
 			productInstallPath = "$(HOME)/Applications";
 			productName = uif2iso;
-			productReference = 8D15AC370486D014006FF6A4 /* uif2iso.app */;
+			productReference = 8D15AC370486D014006FF6A4 /* uif2iso4mac.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -271,7 +271,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "-lz";
-				PRODUCT_NAME = uif2iso;
+				PRODUCT_NAME = uif2iso4mac;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -294,7 +294,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "-lz";
-				PRODUCT_NAME = uif2iso;
+				PRODUCT_NAME = uif2iso4mac;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
