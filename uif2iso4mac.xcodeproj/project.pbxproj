@@ -154,9 +154,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D15AC270486D014006FF6A4 /* uif2iso */ = {
+		8D15AC270486D014006FF6A4 /* uif2iso4mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "uif2iso" */;
+			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "uif2iso4mac" */;
 			buildPhases = (
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
@@ -167,7 +167,7 @@
 			);
 			dependencies = (
 			);
-			name = uif2iso;
+			name = uif2iso4mac;
 			productInstallPath = "$(HOME)/Applications";
 			productName = uif2iso;
 			productReference = 8D15AC370486D014006FF6A4 /* uif2iso.app */;
@@ -185,7 +185,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8D15AC270486D014006FF6A4 /* uif2iso */,
+				8D15AC270486D014006FF6A4 /* uif2iso4mac */,
 			);
 		};
 /* End PBXProject section */
@@ -323,7 +323,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "uif2iso" */ = {
+		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "uif2iso4mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05733C808A9546B00998B17 /* Debug */,
