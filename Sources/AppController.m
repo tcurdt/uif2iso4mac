@@ -19,6 +19,7 @@
 */
 
 #import "AppController.h"
+#import <FeedbackReporter/FRFeedbackReporter.h>
 
 @implementation AppController
 
@@ -32,7 +33,13 @@
 - (void) awakeFromNib
 {
     [[NSApplication sharedApplication] setDelegate:self];
-    
+ 
+    [FRFeedbackReporter reportCrashAsUser:nil];   
+}
+
+- (IBAction)sendFeedback:(id)sender
+{
+    [FRFeedbackReporter reportAsUser:nil];   
 }
 
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender

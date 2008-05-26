@@ -23,4 +23,7 @@
 @interface AppController : NSObject
 {
 }
+
+- (IBAction)sendFeedback:(id)sender;
+
 @end

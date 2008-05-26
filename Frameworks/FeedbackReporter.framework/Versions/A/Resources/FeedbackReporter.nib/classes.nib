@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancel</key>
+				<string>id</string>
+				<key>send</key>
+				<string>id</string>
+				<key>showCrash</key>
+				<string>id</string>
+				<key>showDetails</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FeedbackController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>commentView</key>
+				<string>NSTextView</string>
+				<key>consoleView</key>
+				<string>NSTextView</string>
+				<key>crashField</key>
+				<string>NSTextField</string>
+				<key>crashesView</key>
+				<string>NSTextView</string>
+				<key>emailField</key>
+				<string>NSTextField</string>
+				<key>indicator</key>
+				<string>NSProgressIndicator</string>
+				<key>preferencesView</key>
+				<string>NSTextView</string>
+				<key>sendButton</key>
+				<string>NSButton</string>
+				<key>shellView</key>
+				<string>NSTextView</string>
+				<key>status</key>
+				<string>NSTextField</string>
+				<key>systemView</key>
+				<string>NSTextView</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

@@ -51,5 +51,7 @@
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
 	<string>http://vafer.org/projects/uif2iso4mac/appcast.xml</string>
+    <key>FRFeedbacReporter.targetURL</key>
+    <string>http://vafer.org/feedback.php?project=%@</string>
 </dict>
 </plist>

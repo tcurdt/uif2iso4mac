@@ -26,6 +26,11 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sendFeedback</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>AppController</string>
 			<key>LANGUAGE</key>
