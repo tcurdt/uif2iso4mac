@@ -34,12 +34,12 @@
 {
     [[NSApplication sharedApplication] setDelegate:self];
  
-    [FRFeedbackReporter reportCrashAsUser:nil];   
+    [FRFeedbackReporter reportIfCrash];   
 }
 
 - (IBAction)sendFeedback:(id)sender
 {
-    [FRFeedbackReporter reportAsUser:nil];   
+    [FRFeedbackReporter reportFeedback];   
 }
 
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender

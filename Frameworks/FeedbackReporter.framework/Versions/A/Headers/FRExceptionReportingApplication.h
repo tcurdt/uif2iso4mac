@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Torsten Curdt
+ * Copyright 2008, Jens Alfke, Torsten Curdt
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,8 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface FRFeedbackReporter : NSObject
-{
+@interface FRExceptionReportingApplication : NSApplication {
+
 }
-
-+ (void) setUser:(NSString*)user;
-
-+ (int) reportFeedback;
-+ (int) reportIfCrash;
-+ (int) reportException:(NSException *)exception;
-
-// deprecated
-+ (void) reportAsUser:(NSString*)user;
-+ (void) reportCrashAsUser:(NSString*)user;
-
 
 @end
