@@ -74,7 +74,7 @@
 
     if (![fileManager fileExistsAtPath:sourceName]) {
         NSRunCriticalAlertPanel(@"Source not found", [NSString stringWithFormat:@"Cannot find the file to open.\n'%@'", sourceName], @"Bummer", nil, nil);
-        //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"File not found" waitUntilDone: FALSE];
+        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Source not found" waitUntilDone: FALSE];
         NSLog(@"Source not found");
 
         return;
@@ -82,14 +82,14 @@
 
     if ([fileManager fileExistsAtPath:targetName]) {
         if(NSRunCriticalAlertPanel(@"Target already exists", [NSString stringWithFormat:@"Do you want me to overwrite existing file?\n'%@'", targetName], @"Overwrite", @"Cancel", nil) != 1) {
-            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Canceled" waitUntilDone: FALSE];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Canceled" waitUntilDone: FALSE];
             NSLog(@"Target already exists. Canceled");
 
             return;
         }
         if (![fileManager isWritableFileAtPath:targetName]) {
             NSRunCriticalAlertPanel(@"Target not writeable", [NSString stringWithFormat:@"Cannot overwritet the existing file.\n'%@'", targetName], @"Bummer", nil, nil);
-            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Not writeable" waitUntilDone: FALSE];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Target not writeable" waitUntilDone: FALSE];
             NSLog(@"Target not writeable.");
 
             return;
@@ -159,19 +159,26 @@
 
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
-            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Password protected" waitUntilDone: FALSE];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Password protected" waitUntilDone: FALSE];
             NSLog(@"Password protected");
 
             fclose(fdi);
             return;
         } else {
-            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
             NSLog(@"Wrong signature");
 
             fclose(fdi);
             return;
         }
     }
+
+    [SizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", file_size] waitUntilDone: FALSE];
+    [VersionField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.ver] waitUntilDone: FALSE];
+    [ImageTypeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.image_type] waitUntilDone: FALSE];
+    [SectorsField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectors] waitUntilDone: FALSE];
+    [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
+    [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
 
     long blhr_data_z_len = blhr.size - 8;
     void *blhr_data_z = malloc(blhr_data_z_len);
@@ -243,6 +250,8 @@
         if (!data_z) {
             NSLog(@"Failed to allocate memory for compressed data");
         
+            [ProgressIndicator stopAnimation:self];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -254,6 +263,8 @@
                 NSLog(@"Failed to seek to data");
 
                 free(data_z);
+                [ProgressIndicator stopAnimation:self];
+                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -264,6 +275,8 @@
                 NSLog(@"Failed to read data");
 
                 free(data_z);
+                [ProgressIndicator stopAnimation:self];
+                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -279,6 +292,8 @@
             NSLog(@"Failed to allocate memory for uncompressed data");
 
             free(data_z);
+            [ProgressIndicator stopAnimation:self];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -293,6 +308,8 @@
 
                     free(data);
                     free(data_z);
+                    [ProgressIndicator stopAnimation:self];
+                    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                     free(blhr_data);
                     fclose(fdi);
                     fclose(fdo);
@@ -314,6 +331,8 @@
 
                     free(data);
                     free(data_z);
+                    [ProgressIndicator stopAnimation:self];
+                    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                     free(blhr_data);
                     fclose(fdi);
                     fclose(fdo);
@@ -326,6 +345,8 @@
 
                 free(data);
                 free(data_z);
+                [ProgressIndicator stopAnimation:self];
+                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -338,6 +359,8 @@
             
             free(data);
             free(data_z);
+            [ProgressIndicator stopAnimation:self];
+            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -356,7 +379,6 @@
 
     [ProgressIndicator stopAnimation:self];
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
-
     free(blhr_data);
     fclose(fdi);
     fclose(fdo);
@@ -386,7 +408,7 @@
     inflateEnd(&z);
     
     //[[NSApplication sharedApplication] requestUserAttention:NSInformationalRequest];
-    //[NSApp requestUserAttention:NSInformationalRequest];
+    [NSApp requestUserAttention:NSInformationalRequest];
 }
 
 - (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType
