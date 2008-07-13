@@ -23,11 +23,19 @@
 
 @implementation MyDocument
 
++ (void) load
+{
+    endian = 1;
+
+    if(*(char *)&endian) {
+        endian = 0;
+    } 
+}
+
 - (id)init
 {
     self = [super init];
     if (self) {
-    
     }
     return self;
 }
@@ -54,181 +62,331 @@
                            withObject:nil];
 }
 
-- (void)convert:(id)inObject
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
+- (void) convertWithZlib:(z_stream*)z
+{
     NSString *sourceName = [self fileName];
     NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
 
     NSLog(@"Converting from %@ to %@", sourceName, targetName);
 
-    z_stream    z;
-    blhr_data_t *blhr_data;
-    blhr_t      blhr;
-    bbis_t      bbis;
-    FILE    *fdi,
-            *fdo;
-    u64     tot,
-            file_size;
-    int     i;
-    unsigned insz,
-            outsz;
-    u8      *in,
-            *out;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    endian = 1;
-    if(*(char *)&endian) endian = 0;
+    if (![fileManager fileExistsAtPath:sourceName]) {
+        NSRunCriticalAlertPanel(@"Source not found", [NSString stringWithFormat:@"Cannot find the file to open.\n'%@'", sourceName], @"Bummer", nil, nil);
+        //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"File not found" waitUntilDone: FALSE];
+        NSLog(@"Source not found");
 
-
-    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Opening source" waitUntilDone: FALSE];
-
-    fdi = fopen([sourceName cString], "rb");
-    if(!fdi) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Failed to open source" waitUntilDone: FALSE];
         return;
     }
 
+    if ([fileManager fileExistsAtPath:targetName]) {
+        if(NSRunCriticalAlertPanel(@"Target already exists", [NSString stringWithFormat:@"Do you want me to overwrite existing file?\n'%@'", targetName], @"Overwrite", @"Cancel", nil) != 1) {
+            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Canceled" waitUntilDone: FALSE];
+            NSLog(@"Target already exists. Canceled");
 
-    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Opening target" waitUntilDone: FALSE];
+            return;
+        }
+        if (![fileManager isWritableFileAtPath:targetName]) {
+            NSRunCriticalAlertPanel(@"Target not writeable", [NSString stringWithFormat:@"Cannot overwritet the existing file.\n'%@'", targetName], @"Bummer", nil, nil);
+            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Not writeable" waitUntilDone: FALSE];
+            NSLog(@"Target not writeable.");
 
-    fdo = fopen([targetName cString], "rb");
-    if(fdo) {
-        fclose(fdo);
-        if(NSRunCriticalAlertPanel(@"Target already exists", @"Do you want me to overwrite exising file?", @"Overwrite", @"Cancel", nil) != 1) {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Target already exists" waitUntilDone: FALSE];
             return;
         }
     }
 
-    fdo = fopen([targetName cString], "wb");
-    if(!fdo) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Failed to open target" waitUntilDone: FALSE];
+
+    FILE *fdi = fopen([sourceName UTF8String], "rb");
+
+    if (fdi == NULL) {
+        NSLog(@"Failed to open source %@", sourceName);
+
         return;
     }
 
-    z.zalloc = (alloc_func)0;
-    z.zfree  = (free_func)0;
-    z.opaque = (voidpf)0;
-    if(inflateInit2(&z, 15)) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Failed to open zlib library" waitUntilDone: FALSE];
+    if(fseek(fdi, 0, SEEK_END) != 0) {
+        NSLog(@"Failed to seek");
+
+        fclose(fdi);
         return;
     }
 
-    fseek(fdi, 0, SEEK_END);
-    file_size = ftell(fdi);
-    if(fseek(fdi, file_size - sizeof(bbis), SEEK_SET)) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Failed to seek" waitUntilDone: FALSE];
+    u64 file_size = ftell(fdi);
+
+    if(fseek(fdi, file_size - sizeof(bbis_t), SEEK_SET) != 0) {
+        NSLog(@"Failed to seek");
+
+        fclose(fdi);
         return;
     }
 
-    myfr(fdi, &bbis, sizeof(bbis));
+    bbis_t bbis;
+
+    if (myread(fdi, &bbis, sizeof(bbis_t)) != 0) {
+        NSLog(@"Failed to read");
+
+        fclose(fdi);
+        return;
+    }
+
     b2l_bbis(&bbis);
+
     if(bbis.sign != BBIS_SIGN) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
+        NSLog(@"Wrong signature");
+        
+        fclose(fdi);
+        return;
+    }
+    
+    if(fseek(fdi, bbis.blhr, SEEK_SET) != 0) {
+        NSLog(@"Failed to seek");
+
+        fclose(fdi);
         return;
     }
 
-    [SizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", file_size] waitUntilDone: FALSE];
-    [VersionField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.ver] waitUntilDone: FALSE];
-    [ImageTypeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.image_type] waitUntilDone: FALSE];
-    [SectorsField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectors] waitUntilDone: FALSE];
-    [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
-    [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
+    blhr_t blhr;
 
-    if(fseek(fdi, bbis.blhr, SEEK_SET)) {
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Failed to seek" waitUntilDone: FALSE];
+    if (myread(fdi, &blhr, sizeof(blhr_t)) != 0) {
+        NSLog(@"Failed to read");
+
+        fclose(fdi);
         return;
     }
-
-    myfr(fdi, &blhr, sizeof(blhr));
+    
     b2l_blhr(&blhr);
+
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Password protected" waitUntilDone: FALSE];
+            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Password protected" waitUntilDone: FALSE];
+            NSLog(@"Password protected");
+
+            fclose(fdi);
             return;
         } else {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
+            //[StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
+            NSLog(@"Wrong signature");
+
+            fclose(fdi);
             return;
         }
     }
 
-    in   = out   = NULL;
-    insz = outsz = 0;
-    tot  = 0;
+    long blhr_data_z_len = blhr.size - 8;
+    void *blhr_data_z = malloc(blhr_data_z_len);
+    if (!blhr_data_z) {
+        NSLog(@"Failed to allocate memory for compressed data header");
 
-    myalloc(&in, blhr.size - 8, &insz);
-    myfr(fdi, in, insz);
+        fclose(fdi);
+        return;
+    }
+    
+    if (myread(fdi, blhr_data_z, blhr_data_z_len) != 0) {
+        NSLog(@"Failed to read compressed data header");
 
-    blhr_data = (void *)malloc(sizeof(blhr_data_t) * blhr.num);
-    if(!blhr_data) {
+        free(blhr_data_z);
+        fclose(fdi);
+        return;
     }
 
-    unzip(&z, in, insz, (void *)blhr_data, sizeof(blhr_data_t) * blhr.num);
+    long blhr_data_len = sizeof(blhr_data_t) * blhr.num;
+    blhr_data_t *blhr_data = malloc(blhr_data_len);
+    if(!blhr_data) {
+        NSLog(@"Failed to allocate memory for uncompressed data header");
+    
+        free(blhr_data_z);
+        fclose(fdi);
+        return;
+    }
+
+    if (unzip(z, blhr_data_z, blhr_data_z_len, (void *)blhr_data, blhr_data_len) == -1) {
+        NSLog(@"Failed to uncompress data header");
+    
+        free(blhr_data);
+        free(blhr_data_z);
+        fclose(fdi);
+        return;
+    }
+    
+    free(blhr_data_z);
+    
+    NSLog(@"Uncompressed data header %d -> %d", blhr_data_z_len, blhr_data_len);
+    
+    FILE *fdo = fopen([targetName UTF8String], "wb");
+
+    if (fdo == NULL) {
+        NSLog(@"Failed to open target %@", targetName);
+
+        free(blhr_data);
+        fclose(fdi);
+        return;
+    }
 
     [ProgressIndicator setMaxValue:blhr.num-1];
     [ProgressIndicator startAnimation:self];
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Converting..." waitUntilDone: FALSE];
 
+    int i;
     for(i = 0; i < blhr.num; i++) {
 
         NSLog(@"blhr %d", i);
-        //[ProgressIndicator performSelectorOnMainThread: @selector(setDoubleValue:) withObject: waitUntilDone: FALSE];
+
         [ProgressIndicator setDoubleValue:(double)i];
         [ProgressIndicator displayIfNeeded];
 
         b2l_blhr_data(&blhr_data[i]);
 
-        myalloc(&in, blhr_data[i].zsize, &insz);
+        long data_z_len = blhr_data[i].zsize;
+        void *data_z = malloc(data_z_len);
+        
+        if (!data_z) {
+            NSLog(@"Failed to allocate memory for compressed data");
+        
+            free(blhr_data);
+            fclose(fdi);
+            fclose(fdo);
+            return;
+        }
 
         if(blhr_data[i].zsize) {
-            if(fseek(fdi, blhr_data[i].offset, SEEK_SET)) {
+            if(fseek(fdi, blhr_data[i].offset, SEEK_SET) != 0) {
+                NSLog(@"Failed to seek to data");
+
+                free(data_z);
+                free(blhr_data);
+                fclose(fdi);
+                fclose(fdo);
+                return;
             }
-            myfr(fdi, in, blhr_data[i].zsize);
+            
+            if (myread(fdi, data_z, blhr_data[i].zsize) != 0) {
+                NSLog(@"Failed to read data");
+
+                free(data_z);
+                free(blhr_data);
+                fclose(fdi);
+                fclose(fdo);
+                return;
+            }
         }
 
         blhr_data[i].size *= bbis.sectorsz;
-        myalloc(&out, blhr_data[i].size, &outsz);
+
+        long data_len = blhr_data[i].size;
+        void *data = malloc(data_len);
+        if (!data) {
+            NSLog(@"Failed to allocate memory for uncompressed data");
+
+            free(data_z);
+            free(blhr_data);
+            fclose(fdi);
+            fclose(fdo);
+            return;
+        }
 
         switch(blhr_data[i].type) {
             case 1: {   // non compressed
-                if(blhr_data[i].zsize > blhr_data[i].size) {
-//                    printf("\nError: input size is bigger than output\n");
-//                    myexit();
+                NSLog(@"Uncompressed");
+                if(data_z_len > data_len) {
+                    NSLog(@"Input is bigger than output");
+
+                    free(data);
+                    free(data_z);
+                    free(blhr_data);
+                    fclose(fdi);
+                    fclose(fdo);
+                    return;
                 }
-                memcpy(out, in, blhr_data[i].zsize);
-                memset(out + blhr_data[i].zsize, 0, blhr_data[i].size - blhr_data[i].zsize); // needed?
+                memcpy(data, data_z, data_z_len);
+                memset(data + data_z_len, 0, data_len - data_z_len); // needed?
                 break;
             }
             case 3: {   // multi byte
-                memset(out, 0, blhr_data[i].size);
+                NSLog(@"Multi byte");
+                memset(data, 0, data_len);
                 break;
             }
             case 5: {   // compressed
-                unzip(&z, in, blhr_data[i].zsize, out, blhr_data[i].size);
+                NSLog(@"Compressed");
+                if (unzip(z, data_z, data_z_len, data, data_len) == -1) {
+                    NSLog(@"Failed to uncompress data");
+
+                    free(data);
+                    free(data_z);
+                    free(blhr_data);
+                    fclose(fdi);
+                    fclose(fdo);
+                    return;
+                }
                 break;
             }
             default: {
-//                printf("\nError: unknown type (%d)\n", blhr_data[i].type);
-//                myexit();
+                NSLog(@"Unknown type (%d)", blhr_data[i].type);
+
+                free(data);
+                free(data_z);
+                free(blhr_data);
+                fclose(fdi);
+                fclose(fdo);
+                return;
             }
         }
 
-        if(fseek(fdo, blhr_data[i].sector * bbis.sectorsz, SEEK_SET)) {
+        if(fseek(fdo, blhr_data[i].sector * bbis.sectorsz, SEEK_SET) != 0) {
+            NSLog(@"Failed to seek to output");
+            
+            free(data);
+            free(data_z);
+            free(blhr_data);
+            fclose(fdi);
+            fclose(fdo);
+            return;
         }
-        myfw(fdo, out, blhr_data[i].size);
-        tot += blhr_data[i].size;
+        
+        mywrite(fdo, data, data_len);
+        
+        //tot += blhr_data[i].size;
+        
+        free(data);
+        free(data_z);
     }
 
-    inflateEnd(&z);
-    fclose(fdi);
-    fclose(fdo);
+
 
     [ProgressIndicator stopAnimation:self];
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
 
-    [pool release];
+    free(blhr_data);
+    fclose(fdi);
+    fclose(fdo);
+    return;
 
+}
+
+- (void)convert:(id)sender
+{
+    z_stream z;
+
+    z.zalloc = (alloc_func)0;
+    z.zfree  = (free_func)0;
+    z.opaque = (voidpf)0;
+
+    if(inflateInit2(&z, 15)) {
+        NSLog(@"Failed to open zlib");
+        return;
+    }
+
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    [self convertWithZlib:&z];
+    
+    [pool release];
+    
+    inflateEnd(&z);
+    
+    //[[NSApplication sharedApplication] requestUserAttention:NSInformationalRequest];
+    //[NSApp requestUserAttention:NSInformationalRequest];
 }
 
 - (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType

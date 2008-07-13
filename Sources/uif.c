@@ -22,11 +22,12 @@
 
 int endian;
 
-void myfw(FILE *fd, void *data, unsigned size) {
-    if(fwrite(data, 1, size, fd) == size) return;
-
-//    printf("\nError: problems during the writing of the output file\n");
-//    myexit();
+int mywrite(FILE *fd, void *data, unsigned size) {
+    if(fwrite(data, 1, size, fd) == size) {
+        return 0;
+    }
+    
+    return -1;
 }
 
 void myalloc(u8 **data, unsigned wantsize, unsigned *currsize) {
@@ -39,11 +40,12 @@ void myalloc(u8 **data, unsigned wantsize, unsigned *currsize) {
 }
 
 
-void myfr(FILE *fd, void *data, unsigned size) {
-    if(fread(data, 1, size, fd) == size) return;
-
-//    printf("\nError: incomplete input file, can't read %u bytes\n", size);
-//    myexit();
+int myread(FILE *fd, void *data, unsigned size) {
+    if(fread(data, 1, size, fd) == size) {
+        return 0;
+    }
+    
+    return -1;
 }
 
 int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
@@ -53,10 +55,11 @@ int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
     z->avail_in  = insz;
     z->next_out  = out;
     z->avail_out = outsz;
+
     if(inflate(z, Z_SYNC_FLUSH) != Z_STREAM_END) {
-//        printf("\nError: the compressed input is wrong or incomplete\n");
-//        myexit();
+        return -1;
     }
+
     return(z->total_out);
 }
 
