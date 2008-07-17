@@ -74,9 +74,8 @@ typedef struct {
 
 extern int endian;
 
-void myalloc(u8 **data, unsigned wantsize, unsigned *currsize);
-void myfr(FILE *fd, void *data, unsigned size);
-void myfw(FILE *fd, void *data, unsigned size);
+int myread(FILE *fd, void *data, unsigned size);
+int mywrite(FILE *fd, void *data, unsigned size);
 
 int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz);
 void b2l_blhr(blhr_t *p);

@@ -30,18 +30,6 @@ int mywrite(FILE *fd, void *data, unsigned size) {
     return -1;
 }
 
-/*
-void myalloc(u8 **data, unsigned wantsize, unsigned *currsize) {
-    if(wantsize <= *currsize) return;
-    *data = realloc(*data, wantsize);
-    if(!*data) {
-//        std_err();
-    }
-    *currsize = wantsize;
-}
-*/
-
-
 int myread(FILE *fd, void *data, unsigned size) {
     if(fread(data, 1, size, fd) == size) {
         return 0;
@@ -58,16 +46,9 @@ int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
     z->next_out  = out;
     z->avail_out = outsz;
 
-    int result = inflate(z, Z_FINISH);
-    if(result != Z_STREAM_END) {
+    if(inflate(z, Z_FINISH) != Z_STREAM_END) {
         return -1;
     }
-
-/*
-    if (inflateEnd(z) != Z_OK) {
-        return -2;
-    }
-*/
 
     return(z->total_out);
 }
@@ -112,7 +93,7 @@ void b2l_bbis(bbis_t *p) {
 
 
 void b2l_16(u16 *num) {
-    u16     tmp;
+    u16 tmp;
 
     if(!endian) return;
 
@@ -124,7 +105,7 @@ void b2l_16(u16 *num) {
 
 
 void b2l_32(u32 *num) {
-    u32     tmp;
+    u32 tmp;
 
     if(!endian) return;
 
@@ -138,7 +119,7 @@ void b2l_32(u32 *num) {
 
 
 void b2l_64(u64 *num) {
-    u64     tmp;
+    u64 tmp;
 
     if(!endian) return;
 
@@ -154,10 +135,10 @@ void b2l_64(u64 *num) {
 }
 
 u8 *show_hash(u8 *hash) {
-    int     i;
-    static u8   vis[33];
+    int i;
+    static u8 vis[33];
     static const char hex[16] = "0123456789abcdef";
-    u8      *p;
+    u8 *p;
 
     p = vis;
     for(i = 0; i < 16; i++) {

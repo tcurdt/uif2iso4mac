@@ -127,7 +127,7 @@
     b2l_bbis(&bbis);
 
     if(bbis.sign != BBIS_SIGN) {
-        NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert - not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+        NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert. Not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
         SHOW(@"Wrong signature");        
         fclose(fdi);
         return;
@@ -152,12 +152,12 @@
 
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
-            NSRunCriticalAlertPanel(@"Password protected", [NSString stringWithFormat:@"Cannot convert - file is password protected.\n'%@'", targetName], @"Bummer", nil, nil);
+            NSRunCriticalAlertPanel(@"Password protected", [NSString stringWithFormat:@"Cannot convert. File is password protected.\n'%@'", targetName], @"Bummer", nil, nil);
             SHOW(@"Password protected");
             fclose(fdi);
             return;
         } else {
-            NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert - not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+            NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert. Not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
             SHOW(@"Wrong signature");
             fclose(fdi);
             return;
@@ -173,7 +173,7 @@
 
 #ifndef DEBUG
     if (bbis.ver > 1) {
-        NSRunCriticalAlertPanel(@"Wrong version", [NSString stringWithFormat:@"Cannot convert - this version %d of the UIF format is not yet supported.", bbis.ver], @"Bummer", nil, nil);
+        NSRunCriticalAlertPanel(@"Wrong version", [NSString stringWithFormat:@"Cannot convert. Version %d of the UIF file format is not yet supported.", bbis.ver], @"Bummer", nil, nil);
         SHOW(@"Version %d is not yet supported", bbis.ver);
         fclose(fdi);
         return;
@@ -371,14 +371,6 @@
 }
 
 
-/*
-int BZ2_bzBuffToBuffDecompress( char*         dest,
-                                unsigned int* destLen,
-                                char*         source,
-                                unsigned int  sourceLen,
-                                int           small,
-                                int           verbosity );
-                                */
 - (void)convert:(id)sender
 {
     z_stream z;
@@ -400,7 +392,6 @@ int BZ2_bzBuffToBuffDecompress( char*         dest,
     
     inflateEnd(&z);
     
-    //[[NSApplication sharedApplication] requestUserAttention:NSInformationalRequest];
     [NSApp requestUserAttention:NSInformationalRequest];
 }
 
