@@ -30,6 +30,7 @@ int mywrite(FILE *fd, void *data, unsigned size) {
     return -1;
 }
 
+/*
 void myalloc(u8 **data, unsigned wantsize, unsigned *currsize) {
     if(wantsize <= *currsize) return;
     *data = realloc(*data, wantsize);
@@ -38,6 +39,7 @@ void myalloc(u8 **data, unsigned wantsize, unsigned *currsize) {
     }
     *currsize = wantsize;
 }
+*/
 
 
 int myread(FILE *fd, void *data, unsigned size) {
@@ -56,9 +58,16 @@ int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
     z->next_out  = out;
     z->avail_out = outsz;
 
-    if(inflate(z, Z_SYNC_FLUSH) != Z_STREAM_END) {
+    int result = inflate(z, Z_FINISH);
+    if(result != Z_STREAM_END) {
         return -1;
     }
+
+/*
+    if (inflateEnd(z) != Z_OK) {
+        return -2;
+    }
+*/
 
     return(z->total_out);
 }

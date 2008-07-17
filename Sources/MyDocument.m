@@ -62,36 +62,34 @@
                            withObject:nil];
 }
 
+#define SHOW(...) NSLog(__VA_ARGS__); [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:@"Failed" waitUntilDone: FALSE];
 
 - (void) convertWithZlib:(z_stream*)z
 {
     NSString *sourceName = [self fileName];
     NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
-
+    
     NSLog(@"Converting from %@ to %@", sourceName, targetName);
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if (![fileManager fileExistsAtPath:sourceName]) {
         NSRunCriticalAlertPanel(@"Source not found", [NSString stringWithFormat:@"Cannot find the file to open.\n'%@'", sourceName], @"Bummer", nil, nil);
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Source not found" waitUntilDone: FALSE];
-        NSLog(@"Source not found");
 
+        SHOW(@"Source not found");
         return;
     }
 
     if ([fileManager fileExistsAtPath:targetName]) {
         if(NSRunCriticalAlertPanel(@"Target already exists", [NSString stringWithFormat:@"Do you want me to overwrite existing file?\n'%@'", targetName], @"Overwrite", @"Cancel", nil) != 1) {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Canceled" waitUntilDone: FALSE];
-            NSLog(@"Target already exists. Canceled");
 
+            SHOW(@"Target exists. Canceled");
             return;
         }
         if (![fileManager isWritableFileAtPath:targetName]) {
-            NSRunCriticalAlertPanel(@"Target not writeable", [NSString stringWithFormat:@"Cannot overwritet the existing file.\n'%@'", targetName], @"Bummer", nil, nil);
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Target not writeable" waitUntilDone: FALSE];
-            NSLog(@"Target not writeable.");
+            NSRunCriticalAlertPanel(@"Target not writeable", [NSString stringWithFormat:@"Cannot overwrite the existing file.\n'%@'", targetName], @"Bummer", nil, nil);
 
+            SHOW(@"Target not writeable");
             return;
         }
     }
@@ -100,14 +98,12 @@
     FILE *fdi = fopen([sourceName UTF8String], "rb");
 
     if (fdi == NULL) {
-        NSLog(@"Failed to open source %@", sourceName);
-
+        SHOW(@"Failed to open source %@", sourceName);
         return;
     }
 
     if(fseek(fdi, 0, SEEK_END) != 0) {
-        NSLog(@"Failed to seek");
-
+        SHOW(@"Failed to seek");
         fclose(fdi);
         return;
     }
@@ -115,8 +111,7 @@
     u64 file_size = ftell(fdi);
 
     if(fseek(fdi, file_size - sizeof(bbis_t), SEEK_SET) != 0) {
-        NSLog(@"Failed to seek");
-
+        SHOW(@"Failed to seek");
         fclose(fdi);
         return;
     }
@@ -124,8 +119,7 @@
     bbis_t bbis;
 
     if (myread(fdi, &bbis, sizeof(bbis_t)) != 0) {
-        NSLog(@"Failed to read");
-
+        SHOW(@"Failed to read");
         fclose(fdi);
         return;
     }
@@ -133,15 +127,14 @@
     b2l_bbis(&bbis);
 
     if(bbis.sign != BBIS_SIGN) {
-        NSLog(@"Wrong signature");
-        
+        NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert - not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+        SHOW(@"Wrong signature");        
         fclose(fdi);
         return;
     }
     
     if(fseek(fdi, bbis.blhr, SEEK_SET) != 0) {
-        NSLog(@"Failed to seek");
-
+        SHOW(@"Failed to seek");
         fclose(fdi);
         return;
     }
@@ -149,7 +142,7 @@
     blhr_t blhr;
 
     if (myread(fdi, &blhr, sizeof(blhr_t)) != 0) {
-        NSLog(@"Failed to read");
+        SHOW(@"Failed to read");
 
         fclose(fdi);
         return;
@@ -159,15 +152,13 @@
 
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Password protected" waitUntilDone: FALSE];
-            NSLog(@"Password protected");
-
+            NSRunCriticalAlertPanel(@"Password protected", [NSString stringWithFormat:@"Cannot convert - file is password protected.\n'%@'", targetName], @"Bummer", nil, nil);
+            SHOW(@"Password protected");
             fclose(fdi);
             return;
         } else {
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Wrong signature" waitUntilDone: FALSE];
-            NSLog(@"Wrong signature");
-
+            NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert - not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+            SHOW(@"Wrong signature");
             fclose(fdi);
             return;
         }
@@ -180,18 +171,25 @@
     [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
     [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
 
+#ifndef DEBUG
+    if (bbis.ver > 1) {
+        NSRunCriticalAlertPanel(@"Wrong version", [NSString stringWithFormat:@"Cannot convert - this version %d of the UIF format is not yet supported.", bbis.ver], @"Bummer", nil, nil);
+        SHOW(@"Version %d is not yet supported", bbis.ver);
+        fclose(fdi);
+        return;
+    }
+#endif
+
     long blhr_data_z_len = blhr.size - 8;
     void *blhr_data_z = malloc(blhr_data_z_len);
     if (!blhr_data_z) {
-        NSLog(@"Failed to allocate memory for compressed data header");
-
+        SHOW(@"Failed to allocate memory for compressed data header");
         fclose(fdi);
         return;
     }
     
     if (myread(fdi, blhr_data_z, blhr_data_z_len) != 0) {
-        NSLog(@"Failed to read compressed data header");
-
+        SHOW(@"Failed to read compressed data header");
         free(blhr_data_z);
         fclose(fdi);
         return;
@@ -200,16 +198,21 @@
     long blhr_data_len = sizeof(blhr_data_t) * blhr.num;
     blhr_data_t *blhr_data = malloc(blhr_data_len);
     if(!blhr_data) {
-        NSLog(@"Failed to allocate memory for uncompressed data header");
-    
+        SHOW(@"Failed to allocate memory for uncompressed data header");
         free(blhr_data_z);
         fclose(fdi);
         return;
     }
 
+    NSLog(@"Uncompressing data header %d -> %d", blhr_data_z_len, blhr_data_len);
+
+/*
+    FILE *fd = fopen([[targetName stringByAppendingString:@"-header"] UTF8String], "wb");
+    fwrite(blhr_data_z, 1, blhr_data_z_len, fd);
+    fclose(fd);
+*/
     if (unzip(z, blhr_data_z, blhr_data_z_len, (void *)blhr_data, blhr_data_len) == -1) {
-        NSLog(@"Failed to uncompress data header");
-    
+        SHOW(@"Failed to uncompress data header: %s", z->msg);
         free(blhr_data);
         free(blhr_data_z);
         fclose(fdi);
@@ -218,13 +221,11 @@
     
     free(blhr_data_z);
     
-    NSLog(@"Uncompressed data header %d -> %d", blhr_data_z_len, blhr_data_len);
     
     FILE *fdo = fopen([targetName UTF8String], "wb");
 
     if (fdo == NULL) {
-        NSLog(@"Failed to open target %@", targetName);
-
+        SHOW(@"Failed to open target %@", targetName);
         free(blhr_data);
         fclose(fdi);
         return;
@@ -248,10 +249,8 @@
         void *data_z = malloc(data_z_len);
         
         if (!data_z) {
-            NSLog(@"Failed to allocate memory for compressed data");
-        
             [ProgressIndicator stopAnimation:self];
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
+            SHOW(@"Failed to allocate memory for compressed data");        
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -260,11 +259,9 @@
 
         if(blhr_data[i].zsize) {
             if(fseek(fdi, blhr_data[i].offset, SEEK_SET) != 0) {
-                NSLog(@"Failed to seek to data");
-
-                free(data_z);
                 [ProgressIndicator stopAnimation:self];
-                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
+                SHOW(@"Failed to seek to data");
+                free(data_z);
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -272,11 +269,9 @@
             }
             
             if (myread(fdi, data_z, blhr_data[i].zsize) != 0) {
-                NSLog(@"Failed to read data");
-
-                free(data_z);
                 [ProgressIndicator stopAnimation:self];
-                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
+                SHOW(@"Failed to read data");
+                free(data_z);
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -289,11 +284,9 @@
         long data_len = blhr_data[i].size;
         void *data = malloc(data_len);
         if (!data) {
-            NSLog(@"Failed to allocate memory for uncompressed data");
-
-            free(data_z);
             [ProgressIndicator stopAnimation:self];
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
+            SHOW(@"Failed to allocate memory for uncompressed data");
+            free(data_z);
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -304,12 +297,10 @@
             case 1: {   // non compressed
                 NSLog(@"Uncompressed");
                 if(data_z_len > data_len) {
-                    NSLog(@"Input is bigger than output");
-
+                    [ProgressIndicator stopAnimation:self];
+                    SHOW(@"Input is bigger than output");
                     free(data);
                     free(data_z);
-                    [ProgressIndicator stopAnimation:self];
-                    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                     free(blhr_data);
                     fclose(fdi);
                     fclose(fdo);
@@ -327,12 +318,10 @@
             case 5: {   // compressed
                 NSLog(@"Compressed");
                 if (unzip(z, data_z, data_z_len, data, data_len) == -1) {
-                    NSLog(@"Failed to uncompress data");
-
+                    [ProgressIndicator stopAnimation:self];
+                    SHOW(@"Failed to uncompress data");
                     free(data);
                     free(data_z);
-                    [ProgressIndicator stopAnimation:self];
-                    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                     free(blhr_data);
                     fclose(fdi);
                     fclose(fdo);
@@ -341,12 +330,10 @@
                 break;
             }
             default: {
-                NSLog(@"Unknown type (%d)", blhr_data[i].type);
-
+                [ProgressIndicator stopAnimation:self];
+                SHOW(@"Unknown type (%d)", blhr_data[i].type);
                 free(data);
                 free(data_z);
-                [ProgressIndicator stopAnimation:self];
-                [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
                 free(blhr_data);
                 fclose(fdi);
                 fclose(fdo);
@@ -355,12 +342,10 @@
         }
 
         if(fseek(fdo, blhr_data[i].sector * bbis.sectorsz, SEEK_SET) != 0) {
-            NSLog(@"Failed to seek to output");
-            
+            [ProgressIndicator stopAnimation:self];
+            SHOW(@"Failed to seek to output");            
             free(data);
             free(data_z);
-            [ProgressIndicator stopAnimation:self];
-            [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Conversion failed" waitUntilDone: FALSE];
             free(blhr_data);
             fclose(fdi);
             fclose(fdo);
@@ -376,7 +361,6 @@
     }
 
 
-
     [ProgressIndicator stopAnimation:self];
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
     free(blhr_data);
@@ -386,6 +370,15 @@
 
 }
 
+
+/*
+int BZ2_bzBuffToBuffDecompress( char*         dest,
+                                unsigned int* destLen,
+                                char*         source,
+                                unsigned int  sourceLen,
+                                int           small,
+                                int           verbosity );
+                                */
 - (void)convert:(id)sender
 {
     z_stream z;
