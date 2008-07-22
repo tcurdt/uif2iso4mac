@@ -20,6 +20,7 @@
 
 #import "MyDocument.h"
 #import "uif.h"
+#import "NSProgressIndicator+Thread.h"
 
 @implementation MyDocument
 
@@ -56,6 +57,8 @@
     [SectorSizeField setStringValue:@""];
     [HashField setStringValue:@""];
     [StatusField setStringValue:@""];
+
+    [ProgressIndicator setDoubleValue:0.0];
 
     [NSThread detachNewThreadSelector:@selector(convert)
                              toTarget:self
@@ -304,8 +307,9 @@
         return;
     }
 
-    [ProgressIndicator setMaxValue:blhr.num-1];
-    [ProgressIndicator startAnimation:self];
+    [ProgressIndicator onMainStartAnimation:self];
+    [ProgressIndicator onMainSetMaxValue:blhr.num-1];
+
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Converting..." waitUntilDone: FALSE];
 
     int i;
@@ -313,8 +317,7 @@
 
         NSLog(@"blhr %d", i);
 
-        [ProgressIndicator setDoubleValue:(double)i];
-        [ProgressIndicator displayIfNeeded];
+        [ProgressIndicator onMainSetDoubleValue:(double)i];
 
         /*
         NSEvent *event;
@@ -443,7 +446,7 @@
     }
 
 
-    [ProgressIndicator stopAnimation:self];
+    [ProgressIndicator onMainStopAnimation:self];
     [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
     free(blhr_data);
     fclose(fdi);

@@ -13,6 +13,7 @@
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9D04AF970D99CFAF00D5E1C3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9D7259600D99CD1800326CAF /* Sparkle.framework */; };
+		9D5D59040E36706B00E46126 /* NSProgressIndicator+Thread.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */; };
 		9D6174680D808D0100279899 /* App.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9D6174670D808D0100279899 /* App.icns */; };
 		9D7259440D99CC7B00326CAF /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593E0D99CC7B00326CAF /* AppController.m */; };
 		9D7259450D99CC7B00326CAF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593F0D99CC7B00326CAF /* main.m */; };
@@ -48,6 +49,8 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* uif2iso4mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uif2iso4mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D5D59020E36706B00E46126 /* NSProgressIndicator+Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSProgressIndicator+Thread.h"; path = "Sources/NSProgressIndicator+Thread.h"; sourceTree = "<group>"; };
+		9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSProgressIndicator+Thread.m"; path = "Sources/NSProgressIndicator+Thread.m"; sourceTree = "<group>"; };
 		9D6174670D808D0100279899 /* App.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = App.icns; sourceTree = SOURCE_ROOT; };
 		9D72593D0D99CC7B00326CAF /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = Sources/AppController.h; sourceTree = SOURCE_ROOT; };
 		9D72593E0D99CC7B00326CAF /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppController.m; path = Sources/AppController.m; sourceTree = SOURCE_ROOT; };
@@ -121,6 +124,8 @@
 				9D7259410D99CC7B00326CAF /* MyDocument.m */,
 				9D7259420D99CC7B00326CAF /* uif.c */,
 				9D7259430D99CC7B00326CAF /* uif.h */,
+				9D5D59020E36706B00E46126 /* NSProgressIndicator+Thread.h */,
+				9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -220,6 +225,7 @@
 				9D7259450D99CC7B00326CAF /* main.m in Sources */,
 				9D7259460D99CC7B00326CAF /* MyDocument.m in Sources */,
 				9D7259470D99CC7B00326CAF /* uif.c in Sources */,
+				9D5D59040E36706B00E46126 /* NSProgressIndicator+Thread.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
