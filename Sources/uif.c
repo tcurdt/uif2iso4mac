@@ -64,8 +64,8 @@ int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
 }
 
 u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize) {
-    u8   *in  = NULL;
-    u8          *data;
+    u8 *in  = NULL;
+    u8 *data;
 
     in = malloc(zsize);
     if (!in) {
@@ -139,7 +139,7 @@ void l2n_bbis(bbis_t *p) {
 
 
 void l2n_16(u16 *num) {
-    u16     tmp;
+    u16 tmp;
 
     if(!endian) return;
 
@@ -151,7 +151,7 @@ void l2n_16(u16 *num) {
 
 
 void l2n_32(u32 *num) {
-    u32     tmp;
+    u32 tmp;
 
     if(!endian) return;
 
@@ -165,7 +165,7 @@ void l2n_32(u32 *num) {
 
 
 void l2n_64(u64 *num) {
-    u64     tmp;
+    u64 tmp;
 
     if(!endian) return;
 
@@ -183,7 +183,7 @@ void l2n_64(u64 *num) {
 
 
 void b2n_16(u16 *num) {
-    u16     tmp;
+    u16 tmp;
 
     if(endian) return;
 
@@ -195,7 +195,7 @@ void b2n_16(u16 *num) {
 
 
 void b2n_32(u32 *num) {
-    u32     tmp;
+    u32 tmp;
 
     if(endian) return;
 
@@ -209,7 +209,7 @@ void b2n_32(u32 *num) {
 
 
 void b2n_64(u64 *num) {
-    u64     tmp;
+    u64 tmp;
 
     if(endian) return;
 

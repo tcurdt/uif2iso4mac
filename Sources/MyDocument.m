@@ -43,7 +43,7 @@
 
 - (NSString *)windowNibName
 {
-    return @"MyDocument";
+    return NSLocalizedString(@"MyDocument", nil);
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
@@ -65,7 +65,7 @@
                            withObject:nil];
 }
 
-#define SHOW(...) NSLog(__VA_ARGS__); [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:@"Failed" waitUntilDone: FALSE];
+#define SHOW(...) NSLog(__VA_ARGS__); [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:NSLocalizedString(@"Failed", nil) waitUntilDone: FALSE];
 
 - (void) convertWithZlib:(z_stream*)z
 {
@@ -77,20 +77,35 @@
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if (![fileManager fileExistsAtPath:sourceName]) {
-        NSRunCriticalAlertPanel(@"Source not found", [NSString stringWithFormat:@"Cannot find the file to open.\n'%@'", sourceName], @"Bummer", nil, nil);
+    
+        NSRunCriticalAlertPanel(
+            NSLocalizedString(@"Source not found", nil),
+            [NSString stringWithFormat:NSLocalizedString(@"Cannot find the file to open.\n'%@'", nil), sourceName],
+            NSLocalizedString(@"Bummer", nil),
+            nil, nil);
 
         SHOW(@"Source not found");
         return;
     }
 
     if ([fileManager fileExistsAtPath:targetName]) {
-        if(NSRunCriticalAlertPanel(@"Target already exists", [NSString stringWithFormat:@"Do you want me to overwrite existing file?\n'%@'", targetName], @"Overwrite", @"Cancel", nil) != 1) {
+        if(NSRunCriticalAlertPanel(
+            NSLocalizedString(@"Target already exists", nil),
+            [NSString stringWithFormat:NSLocalizedString(@"Do you want me to overwrite existing file?\n'%@'", nil), targetName],
+            NSLocalizedString(@"Overwrite", nil),
+            NSLocalizedString(@"Cancel", nil),
+            nil) != 1) {
 
             SHOW(@"Target exists. Canceled");
             return;
         }
         if (![fileManager isWritableFileAtPath:targetName]) {
-            NSRunCriticalAlertPanel(@"Target not writeable", [NSString stringWithFormat:@"Cannot overwrite the existing file.\n'%@'", targetName], @"Bummer", nil, nil);
+
+            NSRunCriticalAlertPanel(
+                NSLocalizedString(@"Target not writeable", nil),
+                [NSString stringWithFormat:NSLocalizedString(@"Cannot overwrite the existing file.\n'%@'", nil), targetName],
+                NSLocalizedString(@"Bummer", nil),
+                nil, nil);
 
             SHOW(@"Target not writeable");
             return;
@@ -132,7 +147,13 @@
     l2n_bbis(&bbis);
 
     if(bbis.sign != BBIS_SIGN) {
-        NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert. Not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+
+        NSRunCriticalAlertPanel(
+            NSLocalizedString(@"Wrong signature", nil),
+            [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. Not a UIF file.\n'%@'", nil), targetName],
+            NSLocalizedString(@"Bummer", nil),
+            nil, nil);
+            
         SHOW(@"Wrong signature");        
         fclose(fdi);
         return;
@@ -176,13 +197,25 @@
 
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
-            // TODO unencryption
-            NSRunCriticalAlertPanel(@"Password protected", [NSString stringWithFormat:@"Cannot convert. File is password protected.\n'%@'", targetName], @"Bummer", nil, nil);
+            // TODO decryption
+
+            NSRunCriticalAlertPanel(
+                NSLocalizedString(@"Password protected", nil),
+                [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. File is password protected.\n'%@'", nil), targetName],
+                NSLocalizedString(@"Bummer", nil),
+                nil, nil);
+
             SHOW(@"Password protected");
             fclose(fdi);
             return;
         } else {
-            NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert. Not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
+
+            NSRunCriticalAlertPanel(
+                NSLocalizedString(@"Wrong signature", nil),
+                [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. Not a UIF file.\n'%@'", nil), targetName],
+                NSLocalizedString(@"Bummer", nil),
+                nil, nil);
+                
             SHOW(@"Wrong signature");
             fclose(fdi);
             return;
@@ -195,16 +228,6 @@
     [SectorsField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectors] waitUntilDone: FALSE];
     [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
     [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
-/*
-#ifndef DEBUG
-    if (bbis.ver > 1) {
-        NSRunCriticalAlertPanel(@"Wrong version", [NSString stringWithFormat:@"Cannot convert. Version %d of the UIF file format is not yet supported.", bbis.ver], @"Bummer", nil, nil);
-        SHOW(@"Version %d is not yet supported", bbis.ver);
-        fclose(fdi);
-        return;
-    }
-#endif
-*/
 
     blhr_data_t *blhr_data = (void *)blhr_unzip(fdi, z, ctx, blhr.size - 8, sizeof(blhr_data_t) * blhr.num);
 
@@ -310,7 +333,7 @@
     [ProgressIndicator onMainStartAnimation:self];
     [ProgressIndicator onMainSetMaxValue:blhr.num-1];
 
-    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Converting..." waitUntilDone: FALSE];
+    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: NSLocalizedString(@"Converting...", nil) waitUntilDone: FALSE];
 
     int i;
     for(i = 0; i < blhr.num; i++) {
@@ -319,20 +342,13 @@
 
         [ProgressIndicator onMainSetDoubleValue:(double)i];
 
-        /*
-        NSEvent *event;
-        while(event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]) {
-            [NSApp sendEvent:event];
-        }
-        */
-                
         l2n_blhr_data(&blhr_data[i]);
 
         long data_z_len = blhr_data[i].zsize;
         void *data_z = malloc(data_z_len);
         
         if (!data_z) {
-            [ProgressIndicator stopAnimation:self];
+            [ProgressIndicator onMainStopAnimation:self];
             SHOW(@"Failed to allocate memory for compressed data");        
             free(blhr_data);
             fclose(fdi);
@@ -342,7 +358,7 @@
 
         if(blhr_data[i].zsize) {
             if(fseek(fdi, blhr_data[i].offset, SEEK_SET) != 0) {
-                [ProgressIndicator stopAnimation:self];
+                [ProgressIndicator onMainStopAnimation:self];
                 SHOW(@"Failed to seek to data");
                 free(data_z);
                 free(blhr_data);
@@ -352,7 +368,7 @@
             }
             
             if (myread(fdi, data_z, blhr_data[i].zsize) != 0) {
-                [ProgressIndicator stopAnimation:self];
+                [ProgressIndicator onMainStopAnimation:self];
                 SHOW(@"Failed to read data");
                 free(data_z);
                 free(blhr_data);
@@ -369,7 +385,7 @@
         long data_len = blhr_data[i].size;
         void *data = malloc(data_len);
         if (!data) {
-            [ProgressIndicator stopAnimation:self];
+            [ProgressIndicator onMainStopAnimation:self];
             SHOW(@"Failed to allocate memory for uncompressed data");
             free(data_z);
             free(blhr_data);
@@ -382,7 +398,7 @@
             case 1: {   // non compressed
                 NSLog(@"Uncompressed");
                 if(data_z_len > data_len) {
-                    [ProgressIndicator stopAnimation:self];
+                    [ProgressIndicator onMainStopAnimation:self];
                     SHOW(@"Input is bigger than output");
                     free(data);
                     free(data_z);
@@ -403,7 +419,7 @@
             case 5: {   // compressed
                 NSLog(@"Compressed");
                 if (unzip(z, data_z, data_z_len, data, data_len) == -1) {
-                    [ProgressIndicator stopAnimation:self];
+                    [ProgressIndicator onMainStopAnimation:self];
                     SHOW(@"Failed to uncompress data");
                     free(data);
                     free(data_z);
@@ -415,7 +431,7 @@
                 break;
             }
             default: {
-                [ProgressIndicator stopAnimation:self];
+                [ProgressIndicator onMainStopAnimation:self];
                 SHOW(@"Unknown type (%d)", blhr_data[i].type);
                 free(data);
                 free(data_z);
@@ -427,7 +443,7 @@
         }
 
         if(fseek(fdo, blhr_data[i].sector * bbis.sectorsz, SEEK_SET) != 0) {
-            [ProgressIndicator stopAnimation:self];
+            [ProgressIndicator onMainStopAnimation:self];
             SHOW(@"Failed to seek to output");            
             free(data);
             free(data_z);
@@ -456,7 +472,6 @@
 }
 
 
-//- (void)convert:(id)sender
 - (void)convert
 {
     z_stream z;
