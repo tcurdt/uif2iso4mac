@@ -57,7 +57,7 @@
     [HashField setStringValue:@""];
     [StatusField setStringValue:@""];
 
-    [NSThread detachNewThreadSelector:@selector(convert:)
+    [NSThread detachNewThreadSelector:@selector(convert)
                              toTarget:self
                            withObject:nil];
 }
@@ -116,6 +116,8 @@
         return;
     }
 
+    DES_key_schedule *ctx = NULL;
+    u8 pwdkey[32];
     bbis_t bbis;
 
     if (myread(fdi, &bbis, sizeof(bbis_t)) != 0) {
@@ -124,7 +126,7 @@
         return;
     }
 
-    b2l_bbis(&bbis);
+    l2n_bbis(&bbis);
 
     if(bbis.sign != BBIS_SIGN) {
         NSRunCriticalAlertPanel(@"Wrong signature", [NSString stringWithFormat:@"Cannot convert. Not a UIF file.\n'%@'", targetName], @"Bummer", nil, nil);
@@ -133,6 +135,25 @@
         return;
     }
     
+    /*
+    if (ctx) {
+        bbis.blhr += sizeof(bbis_t) + 8;
+    }
+    */
+    
+    if (bbis.fixedkey > 0) {
+        ctx = malloc(sizeof(DES_key_schedule));
+        if (!ctx) {
+            SHOW(@"Failed to alloc memory for DES");
+            fclose(fdi);
+            return;
+        }
+        
+        uif_crypt_key(pwdkey, (u8 *)fixedkeys[(bbis.fixedkey - 1) & 15]);
+        DES_set_key((void *)pwdkey, ctx);
+    }
+    
+                
     if(fseek(fdi, bbis.blhr, SEEK_SET) != 0) {
         SHOW(@"Failed to seek");
         fclose(fdi);
@@ -148,10 +169,11 @@
         return;
     }
     
-    b2l_blhr(&blhr);
+    l2n_blhr(&blhr);
 
     if(blhr.sign != BLHR_SIGN) {
         if(blhr.sign == BSDR_SIGN) {
+            // TODO unencryption
             NSRunCriticalAlertPanel(@"Password protected", [NSString stringWithFormat:@"Cannot convert. File is password protected.\n'%@'", targetName], @"Bummer", nil, nil);
             SHOW(@"Password protected");
             fclose(fdi);
@@ -170,7 +192,7 @@
     [SectorsField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectors] waitUntilDone: FALSE];
     [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
     [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
-
+/*
 #ifndef DEBUG
     if (bbis.ver > 1) {
         NSRunCriticalAlertPanel(@"Wrong version", [NSString stringWithFormat:@"Cannot convert. Version %d of the UIF file format is not yet supported.", bbis.ver], @"Bummer", nil, nil);
@@ -179,47 +201,98 @@
         return;
     }
 #endif
-
-    long blhr_data_z_len = blhr.size - 8;
-    void *blhr_data_z = malloc(blhr_data_z_len);
-    if (!blhr_data_z) {
-        SHOW(@"Failed to allocate memory for compressed data header");
-        fclose(fdi);
-        return;
-    }
-    
-    if (myread(fdi, blhr_data_z, blhr_data_z_len) != 0) {
-        SHOW(@"Failed to read compressed data header");
-        free(blhr_data_z);
-        fclose(fdi);
-        return;
-    }
-
-    long blhr_data_len = sizeof(blhr_data_t) * blhr.num;
-    blhr_data_t *blhr_data = malloc(blhr_data_len);
-    if(!blhr_data) {
-        SHOW(@"Failed to allocate memory for uncompressed data header");
-        free(blhr_data_z);
-        fclose(fdi);
-        return;
-    }
-
-    NSLog(@"Uncompressing data header %d -> %d", blhr_data_z_len, blhr_data_len);
-
-/*
-    FILE *fd = fopen([[targetName stringByAppendingString:@"-header"] UTF8String], "wb");
-    fwrite(blhr_data_z, 1, blhr_data_z_len, fd);
-    fclose(fd);
 */
-    if (unzip(z, blhr_data_z, blhr_data_z_len, (void *)blhr_data, blhr_data_len) == -1) {
-        SHOW(@"Failed to uncompress data header: %s", z->msg);
-        free(blhr_data);
-        free(blhr_data_z);
+
+    blhr_data_t *blhr_data = (void *)blhr_unzip(fdi, z, ctx, blhr.size - 8, sizeof(blhr_data_t) * blhr.num);
+
+    if (!blhr_data) {
+        SHOW(@"Failed to unzip BLHR data");
         fclose(fdi);
         return;
     }
+
+    if (bbis.image_type == 8) {
     
-    free(blhr_data_z);
+        // nothing to do
+
+    } else if (bbis.image_type == 9) {
+
+        blhr_t blms;
+
+        if (myread(fdi, &blms, sizeof(blhr_t)) != 0) {
+            SHOW(@"Failed to read");
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        }
+
+        l2n_blhr(&blms);
+
+        if(blms.sign != BLMS_SIGN) {
+            SHOW(@"Wrong BLMS signature (%08x)", blms.sign);
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        }
+
+        u8 *blms_data = blhr_unzip(fdi, z, ctx, blms.size - 8, blms.num);
+        
+        if (!blms_data) {
+            SHOW(@"Failed to unzip BLMS");
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        }
+        
+        blhr_t blss;
+        
+        if (myread(fdi, &blss, sizeof(blhr_t)) != 0) {
+            SHOW(@"Failed to read");
+            free(blms_data);
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        }
+        
+
+        if(fseek(fdi, 4, SEEK_CUR) != 0) {
+            SHOW(@"Failed to seek");
+            free(blms_data);
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        }
+
+        l2n_blhr(&blss);
+
+        if(blss.sign != BLSS_SIGN) {
+            SHOW(@"Wrong BLMS signature (%08x)", blms.sign);
+            free(blms_data);
+            free(blhr_data);
+            fclose(fdi);
+            return;
+        } else {
+            if(blss.num) {
+                SHOW(@"CUE file embedded");
+                free(blms_data);
+                free(blhr_data);
+                fclose(fdi);
+                return;
+            } else {
+                SHOW(@"NRG file embedded");
+                free(blms_data);
+                free(blhr_data);
+                fclose(fdi);
+                return;
+            }
+        }
+
+    } else {
+        SHOW(@"Unknown image type %d", bbis.image_type);
+        free(blhr_data);
+        fclose(fdi);
+        return;
+    }
     
     
     FILE *fdo = fopen([targetName UTF8String], "wb");
@@ -243,7 +316,14 @@
         [ProgressIndicator setDoubleValue:(double)i];
         [ProgressIndicator displayIfNeeded];
 
-        b2l_blhr_data(&blhr_data[i]);
+        /*
+        NSEvent *event;
+        while(event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]) {
+            [NSApp sendEvent:event];
+        }
+        */
+                
+        l2n_blhr_data(&blhr_data[i]);
 
         long data_z_len = blhr_data[i].zsize;
         void *data_z = malloc(data_z_len);
@@ -277,6 +357,8 @@
                 fclose(fdo);
                 return;
             }
+
+            uif_crypt(ctx, data_z, blhr_data[i].zsize);
         }
 
         blhr_data[i].size *= bbis.sectorsz;
@@ -371,7 +453,8 @@
 }
 
 
-- (void)convert:(id)sender
+//- (void)convert:(id)sender
+- (void)convert
 {
     z_stream z;
 

@@ -23,15 +23,20 @@
 #include <string.h>
 #include <stdint.h>
 #include <zlib.h>
+#include <openssl/des.h>
 
 typedef uint8_t     u8;
 typedef uint16_t    u16;
+typedef int32_t     i32;
 typedef uint32_t    u32;
+typedef int64_t     i64;
 typedef uint64_t    u64;
 
 #define BBIS_SIGN   0x73696262
 #define BLHR_SIGN   0x72686c62
 #define BSDR_SIGN   0x72647362
+#define BLMS_SIGN   0x736d6c62
+#define BLSS_SIGN   0x73736c62
 
 #define off_t   off64_t
 #define fseek   fseeko
@@ -56,32 +61,41 @@ typedef struct {
 
 typedef struct {
     u32     sign;       // bbis
-    u32     unknown1;   // ignored, probably the size of the structure
+    u32     bbis_size;  // ignored, probably the size of the structure
     u16     ver;        // version, 1
-    u32     image_type; // 8
+    u16     image_type; // 8 for ISO, 9 for mixed
+    u16     unknown1;   // ???
     u16     padding;    // ignored
     u32     sectors;    // number of sectors of the ISO
     u32     sectorsz;   // CD use sectors and this is the size of them (chunks)
     u32     unknown2;   // almost ignored
     u64     blhr;       // where is located the blhr header
     u32     blhrbbissz; // total size of the blhr and bbis headers
-    u8      hash[16];   // hash? what algo?
-    u32     unknown3;   // ignored
+    u8      hash[16];   // hash, used with passwords
+    u32     fixedkey;   // ignored
     u32     unknown4;   // ignored
 } bbis_t;
 
 #pragma pack()
 
 extern int endian;
+extern const char *fixedkeys[];
 
 int myread(FILE *fd, void *data, unsigned size);
 int mywrite(FILE *fd, void *data, unsigned size);
 
+u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize);
 int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz);
-void b2l_blhr(blhr_t *p);
-void b2l_blhr_data(blhr_data_t *p);
-void b2l_bbis(bbis_t *p);
-void b2l_16(u16 *num);
-void b2l_32(u32 *num);
-void b2l_64(u64 *num);
+void uif_crypt(DES_key_schedule *ctx, u8 *data, int size);
+
+void l2n_blhr(blhr_t *p);
+void l2n_blhr_data(blhr_data_t *p);
+void l2n_bbis(bbis_t *p);
+void l2n_16(u16 *num);  // from little endian to number
+void l2n_32(u32 *num);
+void l2n_64(u64 *num);
+void b2n_16(u16 *num);  // from big endian to number
+void b2n_32(u32 *num);
+void b2n_64(u64 *num);
+
 u8 *show_hash(u8 *hash);
