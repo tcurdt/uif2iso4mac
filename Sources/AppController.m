@@ -20,6 +20,10 @@
 
 #import "AppController.h"
 #import <FeedbackReporter/FRFeedbackReporter.h>
+#import <Sparkle/SUUpdater.h>
+#import <uuid/uuid.h>
+
+#define U2IF4_INSTALLATIONID @"U2IF4InstallationId"
 
 @implementation AppController
 
@@ -33,13 +37,56 @@
 - (void) awakeFromNib
 {
     [[NSApplication sharedApplication] setDelegate:self];
+
+    [[SUUpdater sharedUpdater] setDelegate:self];
  
-    [FRFeedbackReporter reportIfCrash];   
+    [[FRFeedbackReporter sharedReporter] reportIfCrash];   
 }
+
+- (NSString*)installationId
+{
+    NSString *uuid = [[NSUserDefaults standardUserDefaults] valueForKey:U2IF4_INSTALLATIONID];
+
+    if (uuid == nil) {
+
+        uuid_t buffer;
+        
+        uuid_generate(buffer);
+
+        char str[37];
+
+        uuid_unparse_upper(buffer, str);
+        
+        uuid = [NSString stringWithFormat:@"%s", str];
+
+        NSLog(@"Generated UUID %@", uuid);
+        
+        [[NSUserDefaults standardUserDefaults] setValue: uuid
+                                                 forKey: U2IF4_INSTALLATIONID];
+    }
+
+    return uuid;
+}
+
+- (NSArray *)feedParametersForHostBundle:(NSBundle *)bundle sendingSystemProfile:(BOOL)sendingProfile
+{
+    NSLog(@"Adding parameters to sparkle check");
+
+	NSArray *keys = [NSArray arrayWithObjects:@"key", @"value", nil];
+
+    NSArray *parameters = [NSArray arrayWithObject:
+        [NSDictionary dictionaryWithObjects:
+        [NSArray arrayWithObjects:
+        @"installationId", [self installationId], nil]
+        forKeys:keys]];
+
+    return parameters;
+}
+
 
 - (IBAction)sendFeedback:(id)sender
 {
-    [FRFeedbackReporter reportFeedback];   
+    [[FRFeedbackReporter sharedReporter] reportFeedback];   
 }
 
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
