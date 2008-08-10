@@ -49,9 +49,13 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>FRExceptionReportingApplication</string>
-	<key>SUFeedURL</key>
-	<string>http://vafer.org/projects/uif2iso4mac/appcast.xml</string>
 	<key>FRFeedbacReporter.targetURL</key>
 	<string>http://vafer.org/feedback.php?project=%@</string>
+	<key>SUFeedURL</key>
+	<string>http://vafer.org/projects/uif2iso4mac/appcast.xml</string>
+	<key>SUSendProfileInfo</key>
+	<true/>
+	<key>SUEnableSystemProfiling</key>
+	<true/>
 </dict>
 </plist>
