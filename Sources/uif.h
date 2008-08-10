@@ -47,7 +47,7 @@ typedef uint64_t    u64;
 typedef struct {
     u32     sign;       // blhr
     u32     size;       // size of the data plus ver and num
-    u32     ver;        // ignored
+    u32     compressed; // compressed data
     u32     num;        // number of blhr_data structures
 } blhr_t;
 
@@ -84,7 +84,7 @@ extern const char *fixedkeys[];
 int myread(FILE *fd, void *data, unsigned size);
 int mywrite(FILE *fd, void *data, unsigned size);
 
-u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize);
+u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize, int compressed);
 int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz);
 void uif_crypt(DES_key_schedule *ctx, u8 *data, int size);
 

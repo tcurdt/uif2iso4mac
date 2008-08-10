@@ -60,20 +60,10 @@
 
     [ProgressIndicator setDoubleValue:0.0];
 
-    [NSThread detachNewThreadSelector:@selector(convert)
-                             toTarget:self
-                           withObject:nil];
-}
-
-#define SHOW(...) NSLog(__VA_ARGS__); [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:NSLocalizedString(@"Failed", nil) waitUntilDone: FALSE];
-
-- (void) convertWithZlib:(z_stream*)z
-{
     NSString *sourceName = [self fileName];
     NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
     
     NSLog(@"Converting from %@ to %@", sourceName, targetName);
-
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if (![fileManager fileExistsAtPath:sourceName]) {
@@ -84,7 +74,8 @@
             NSLocalizedString(@"Bummer", nil),
             nil, nil);
 
-        SHOW(@"Source not found");
+        NSLog(@"Source not found");
+        [self close];
         return;
     }
 
@@ -96,7 +87,8 @@
             NSLocalizedString(@"Cancel", nil),
             nil) != 1) {
 
-            SHOW(@"Target exists. Canceled");
+            NSLog(@"Target exists. Canceled");
+            [self close];
             return;
         }
         if (![fileManager isWritableFileAtPath:targetName]) {
@@ -107,11 +99,23 @@
                 NSLocalizedString(@"Bummer", nil),
                 nil, nil);
 
-            SHOW(@"Target not writeable");
+            NSLog(@"Target not writeable");
+            [self close];
             return;
         }
     }
 
+    [NSThread detachNewThreadSelector:@selector(convert)
+                             toTarget:self
+                           withObject:nil];
+}
+
+#define SHOW(...) NSLog(__VA_ARGS__); error = [NSString stringWithFormat:__VA_ARGS__];
+
+- (void) convertWithZlib:(z_stream*)z
+{
+    NSString *sourceName = [self fileName];
+    NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
 
     FILE *fdi = fopen([sourceName UTF8String], "rb");
 
@@ -147,13 +151,6 @@
     l2n_bbis(&bbis);
 
     if(bbis.sign != BBIS_SIGN) {
-
-        NSRunCriticalAlertPanel(
-            NSLocalizedString(@"Wrong signature", nil),
-            [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. Not a UIF file.\n'%@'", nil), targetName],
-            NSLocalizedString(@"Bummer", nil),
-            nil, nil);
-            
         SHOW(@"Wrong signature");        
         fclose(fdi);
         return;
@@ -199,23 +196,11 @@
         if(blhr.sign == BSDR_SIGN) {
             // TODO decryption
 
-            NSRunCriticalAlertPanel(
-                NSLocalizedString(@"Password protected", nil),
-                [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. File is password protected.\n'%@'", nil), targetName],
-                NSLocalizedString(@"Bummer", nil),
-                nil, nil);
-
             SHOW(@"Password protected");
             fclose(fdi);
             return;
         } else {
 
-            NSRunCriticalAlertPanel(
-                NSLocalizedString(@"Wrong signature", nil),
-                [NSString stringWithFormat:NSLocalizedString(@"Cannot convert. Not a UIF file.\n'%@'", nil), targetName],
-                NSLocalizedString(@"Bummer", nil),
-                nil, nil);
-                
             SHOW(@"Wrong signature");
             fclose(fdi);
             return;
@@ -229,7 +214,7 @@
     [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
     [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
 
-    blhr_data_t *blhr_data = (void *)blhr_unzip(fdi, z, ctx, blhr.size - 8, sizeof(blhr_data_t) * blhr.num);
+    blhr_data_t *blhr_data = (void *)blhr_unzip(fdi, z, ctx, blhr.size - 8, sizeof(blhr_data_t) * blhr.num, blhr.compressed);
 
     if (!blhr_data) {
         SHOW(@"Failed to unzip BLHR data");
@@ -261,7 +246,7 @@
             return;
         }
 
-        u8 *blms_data = blhr_unzip(fdi, z, ctx, blms.size - 8, blms.num);
+        u8 *blms_data = blhr_unzip(fdi, z, ctx, blms.size - 8, blms.num, blms.compressed);
         
         if (!blms_data) {
             SHOW(@"Failed to unzip BLMS");
@@ -488,6 +473,20 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     [self convertWithZlib:&z];
+    
+    if (error != nil) {
+
+        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:NSLocalizedString(@"Failed", nil) waitUntilDone: FALSE];
+
+        NSLog(@"Showing alert: %@", error);
+
+        NSRunCriticalAlertPanel(
+            NSLocalizedString(@"Conversion failed", nil),
+            [NSString stringWithFormat:error],
+            NSLocalizedString(@"Bummer", nil),
+            nil, nil);
+    }
+    
     
     [pool release];
     

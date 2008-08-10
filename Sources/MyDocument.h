@@ -31,6 +31,8 @@
     IBOutlet NSTextField *StatusField;
 
     IBOutlet NSProgressIndicator *ProgressIndicator;
+    
+    NSString *error;
 }
 
 @end

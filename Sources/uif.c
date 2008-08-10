@@ -63,9 +63,24 @@ int unzip(z_stream *z, u8 *in, int insz, u8 *out, int outsz) {
     return(z->total_out);
 }
 
-u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize) {
+u8 *blhr_unzip(FILE *fd, z_stream *z, DES_key_schedule *ctx, u32 zsize, u32 unzsize, int compressed) {
     u8 *in  = NULL;
     u8 *data;
+
+    if (!compressed) {
+
+        data = malloc(unzsize);
+        if (!data) {
+            return NULL;
+        }
+
+        if (myread(fd, data, unzsize) != 0) {
+            free(in);
+            return NULL;
+        }
+
+        return(data);
+    }
 
     in = malloc(zsize);
     if (!in) {
@@ -102,7 +117,7 @@ void l2n_blhr(blhr_t *p) {
     if(!endian) return;
     l2n_32(&p->sign);
     l2n_32(&p->size);
-    l2n_32(&p->ver);
+    l2n_32(&p->compressed);
     l2n_32(&p->num);
 }
 
