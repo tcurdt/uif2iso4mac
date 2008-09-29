@@ -193,22 +193,22 @@ by Luigi Auriemma
 e-mail: aluigi@autistici.org
 web:    aluigi.org
 
-- open /Users/tcurdt/Desktop/uif2iso/27 C++ Programming Books.uif
+- open /Users/tcurdt/Desktop/uif2iso/Test.uif
 
-  file size    0000000007ae24e3
+  file size    0000000007af24e3
   version      4
   image type   8
   padding      0
   sectors      92602
   sectors size 2048
-  blhr offset  0000000007ae10d7
+  blhr offset  0000000007af10d7
   blhr size    5132
-  hash         d90c8cb1a9a618ba0d6f1576d31afe2c
+  hash         d90c7cb1a9a418ba0d6f1576d31afe2c
   others       00000040 00000000 01 02 02 00 00000000
 
 - enable magiciso_is_shit encryption
 - ISO output image format
-- create /Users/tcurdt/Desktop/uif2iso/27 C++ Programming Books.iso
+- create /Users/tcurdt/Desktop/uif2iso/Test.iso
 - start unpacking:
   000%
   100%
