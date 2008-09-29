@@ -49,8 +49,6 @@
     [SizeField setStringValue:@""];
     [VersionField setStringValue:@""];
     [ImageTypeField setStringValue:@""];
-    [SectorsField setStringValue:@""];
-    [SectorSizeField setStringValue:@""];
     [HashField setStringValue:@""];
     [StatusField setStringValue:@""];
 
@@ -99,6 +97,8 @@
             [self close];
             return;
         }
+        
+        [fileManager removeFileAtPath:targetName handler:nil];
     }
 
     NSLog(@"Converting %@ -> %@", sourceName, targetName);
@@ -127,20 +127,20 @@
         [StatusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
     } else if ([s hasPrefix:@"  file size"]) {
         NSString *sub = [s substringFromIndex:15];
-        // conversion
-        [SizeField setStringValue:sub];
+
+        unsigned size;
+        if([[NSScanner scannerWithString:sub] scanHexInt: &size]) {
+            [SizeField setIntValue:size];
+        } else {
+            NSLog(@"Could not parse size: %@");
+        }
+
     } else if ([s hasPrefix:@"  version"]) {
         NSString *sub = [s substringFromIndex:15];
         [VersionField setStringValue:sub];
     } else if ([s hasPrefix:@"  image type"]) {
         NSString *sub = [s substringFromIndex:15];
         [ImageTypeField setStringValue:sub];
-    } else if ([s hasPrefix:@"  sectors"]) {
-        NSString *sub = [s substringFromIndex:15];
-        [SectorsField setStringValue:sub];
-    } else if ([s hasPrefix:@"  sectors size"]) {
-        NSString *sub = [s substringFromIndex:15];
-        [SectorSizeField setStringValue:sub];
     } else if ([s hasPrefix:@"  hash"]) {
         NSString *sub = [s substringFromIndex:15];
         [HashField setStringValue:sub];

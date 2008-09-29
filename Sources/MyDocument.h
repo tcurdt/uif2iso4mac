@@ -26,8 +26,6 @@
     IBOutlet NSTextField *SizeField;
     IBOutlet NSTextField *VersionField;
     IBOutlet NSTextField *ImageTypeField;
-    IBOutlet NSTextField *SectorsField;
-    IBOutlet NSTextField *SectorSizeField;
     IBOutlet NSTextField *HashField;
     IBOutlet NSTextField *StatusField;
 
