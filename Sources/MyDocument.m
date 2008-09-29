@@ -19,24 +19,20 @@
 */
 
 #import "MyDocument.h"
-#import "uif.h"
 #import "NSProgressIndicator+Thread.h"
+#import "TaskCommand.h"
 
 @implementation MyDocument
-
-+ (void) load
-{
-    endian = 1;
-
-    if(*(char *)&endian) {
-        endian = 0;
-    } 
-}
 
 - (id)init
 {
     self = [super init];
     if (self) {
+        NSString *executable = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"uif2iso"];
+        
+        NSLog(@"Using executable %@", executable);
+        
+        cmd = [[TaskCommand alloc] initWithPath:executable];
     }
     return self;
 }
@@ -105,395 +101,65 @@
         }
     }
 
-    [NSThread detachNewThreadSelector:@selector(convert)
-                             toTarget:self
-                           withObject:nil];
+    NSLog(@"Converting %@ -> %@", sourceName, targetName);
+    
+    [cmd setArgs:[NSArray arrayWithObjects:
+                        sourceName,
+                        targetName,
+                        nil]];
+    [cmd setDelegate:self];
+    [cmd execute];
 }
 
-#define SHOW(...) NSLog(__VA_ARGS__); error = [NSString stringWithFormat:__VA_ARGS__];
-
-- (void) convertWithZlib:(z_stream*)z
+- (void) receivedOutput:(NSString*)s
 {
-    NSString *sourceName = [self fileName];
-    NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
-
-    FILE *fdi = fopen([sourceName UTF8String], "rb");
-
-    if (fdi == NULL) {
-        SHOW(@"Failed to open source %@", sourceName);
-        return;
-    }
-
-    if(fseek(fdi, 0, SEEK_END) != 0) {
-        SHOW(@"Failed to seek");
-        fclose(fdi);
-        return;
-    }
-
-    u64 file_size = ftell(fdi);
-
-    if(fseek(fdi, file_size - sizeof(bbis_t), SEEK_SET) != 0) {
-        SHOW(@"Failed to seek");
-        fclose(fdi);
-        return;
-    }
-
-    DES_key_schedule *ctx = NULL;
-    u8 pwdkey[32];
-    bbis_t bbis;
-
-    if (myread(fdi, &bbis, sizeof(bbis_t)) != 0) {
-        SHOW(@"Failed to read");
-        fclose(fdi);
-        return;
-    }
-
-    l2n_bbis(&bbis);
-
-    if(bbis.sign != BBIS_SIGN) {
-        SHOW(@"Wrong signature");        
-        fclose(fdi);
-        return;
-    }
-    
-    /*
-    if (ctx) {
-        bbis.blhr += sizeof(bbis_t) + 8;
-    }
-    */
-    
-    if (bbis.fixedkey > 0) {
-        ctx = malloc(sizeof(DES_key_schedule));
-        if (!ctx) {
-            SHOW(@"Failed to alloc memory for DES");
-            fclose(fdi);
-            return;
-        }
-        
-        uif_crypt_key(pwdkey, (u8 *)fixedkeys[(bbis.fixedkey - 1) & 15]);
-        DES_set_key((void *)pwdkey, ctx);
-    }
-    
-                
-    if(fseek(fdi, bbis.blhr, SEEK_SET) != 0) {
-        SHOW(@"Failed to seek");
-        fclose(fdi);
-        return;
-    }
-
-    blhr_t blhr;
-
-    if (myread(fdi, &blhr, sizeof(blhr_t)) != 0) {
-        SHOW(@"Failed to read");
-
-        fclose(fdi);
-        return;
-    }
-    
-    l2n_blhr(&blhr);
-
-    if(blhr.sign != BLHR_SIGN) {
-        if(blhr.sign == BSDR_SIGN) {
-            // TODO decryption
-
-            SHOW(@"Password protected");
-            fclose(fdi);
-            return;
-        } else {
-
-            SHOW(@"Wrong signature");
-            fclose(fdi);
-            return;
-        }
-    }
-
-    [SizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", file_size] waitUntilDone: FALSE];
-    [VersionField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.ver] waitUntilDone: FALSE];
-    [ImageTypeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.image_type] waitUntilDone: FALSE];
-    [SectorsField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectors] waitUntilDone: FALSE];
-    [SectorSizeField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%d", bbis.sectorsz] waitUntilDone: FALSE];
-    [HashField performSelectorOnMainThread: @selector(setStringValue:) withObject: [NSString stringWithFormat:@"%s", show_hash(bbis.hash)] waitUntilDone: FALSE];
-
-    blhr_data_t *blhr_data = (void *)blhr_unzip(fdi, z, ctx, blhr.size - 8, sizeof(blhr_data_t) * blhr.num, blhr.compressed);
-
-    if (!blhr_data) {
-        SHOW(@"Failed to unzip BLHR data");
-        fclose(fdi);
-        return;
-    }
-
-    if (bbis.image_type == 8) {
-    
-        // nothing to do
-
-    } else if (bbis.image_type == 9) {
-
-        blhr_t blms;
-
-        if (myread(fdi, &blms, sizeof(blhr_t)) != 0) {
-            SHOW(@"Failed to read");
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        }
-
-        l2n_blhr(&blms);
-
-        if(blms.sign != BLMS_SIGN) {
-            SHOW(@"Wrong BLMS signature (%08x)", blms.sign);
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        }
-
-        u8 *blms_data = blhr_unzip(fdi, z, ctx, blms.size - 8, blms.num, blms.compressed);
-        
-        if (!blms_data) {
-            SHOW(@"Failed to unzip BLMS");
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        }
-        
-        blhr_t blss;
-        
-        if (myread(fdi, &blss, sizeof(blhr_t)) != 0) {
-            SHOW(@"Failed to read");
-            free(blms_data);
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        }
-        
-
-        if(fseek(fdi, 4, SEEK_CUR) != 0) {
-            SHOW(@"Failed to seek");
-            free(blms_data);
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        }
-
-        l2n_blhr(&blss);
-
-        if(blss.sign != BLSS_SIGN) {
-            SHOW(@"Wrong BLMS signature (%08x)", blms.sign);
-            free(blms_data);
-            free(blhr_data);
-            fclose(fdi);
-            return;
-        } else {
-            if(blss.num) {
-                SHOW(@"CUE file embedded");
-                free(blms_data);
-                free(blhr_data);
-                fclose(fdi);
-                return;
-            } else {
-                SHOW(@"NRG file embedded");
-                free(blms_data);
-                free(blhr_data);
-                fclose(fdi);
-                return;
-            }
-        }
-
+    if ([s hasSuffix:@"%\r"]) {
+        NSString *sub = [s substringWithRange:NSMakeRange(2,3)];        
+        double p = [sub doubleValue];
+        [ProgressIndicator setDoubleValue:p];
+    } else if ([@"- start unpacking:" isEqualToString:s]) {
+        [ProgressIndicator startAnimation:self];
+        [ProgressIndicator setMaxValue:100];
+        [StatusField setStringValue:NSLocalizedString(@"Converting...", nil)];
+    } else if ([@"- finished" isEqualToString:s]) {
+        [ProgressIndicator setDoubleValue:100];
+        [ProgressIndicator stopAnimation:self];
+        [StatusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+    } else if ([s hasPrefix:@"  file size"]) {
+        NSString *sub = [s substringFromIndex:15];
+        // conversion
+        [SizeField setStringValue:sub];
+    } else if ([s hasPrefix:@"  version"]) {
+        NSString *sub = [s substringFromIndex:15];
+        [VersionField setStringValue:sub];
+    } else if ([s hasPrefix:@"  image type"]) {
+        NSString *sub = [s substringFromIndex:15];
+        [ImageTypeField setStringValue:sub];
+    } else if ([s hasPrefix:@"  sectors"]) {
+        NSString *sub = [s substringFromIndex:15];
+        [SectorsField setStringValue:sub];
+    } else if ([s hasPrefix:@"  sectors size"]) {
+        NSString *sub = [s substringFromIndex:15];
+        [SectorSizeField setStringValue:sub];
+    } else if ([s hasPrefix:@"  hash"]) {
+        NSString *sub = [s substringFromIndex:15];
+        [HashField setStringValue:sub];
     } else {
-        SHOW(@"Unknown image type %d", bbis.image_type);
-        free(blhr_data);
-        fclose(fdi);
-        return;
+        NSLog(@"OUT: [%@]", s);
     }
-    
-    
-    FILE *fdo = fopen([targetName UTF8String], "wb");
-
-    if (fdo == NULL) {
-        SHOW(@"Failed to open target %@", targetName);
-        free(blhr_data);
-        fclose(fdi);
-        return;
-    }
-
-    [ProgressIndicator onMainStartAnimation:self];
-    [ProgressIndicator onMainSetMaxValue:blhr.num-1];
-
-    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: NSLocalizedString(@"Converting...", nil) waitUntilDone: FALSE];
-
-    int i;
-    for(i = 0; i < blhr.num; i++) {
-
-        NSLog(@"blhr %d", i);
-
-        [ProgressIndicator onMainSetDoubleValue:(double)i];
-
-        l2n_blhr_data(&blhr_data[i]);
-
-        long data_z_len = blhr_data[i].zsize;
-        void *data_z = malloc(data_z_len);
-        
-        if (!data_z) {
-            [ProgressIndicator onMainStopAnimation:self];
-            SHOW(@"Failed to allocate memory for compressed data");        
-            free(blhr_data);
-            fclose(fdi);
-            fclose(fdo);
-            return;
-        }
-
-        if(blhr_data[i].zsize) {
-            if(fseek(fdi, blhr_data[i].offset, SEEK_SET) != 0) {
-                [ProgressIndicator onMainStopAnimation:self];
-                SHOW(@"Failed to seek to data");
-                free(data_z);
-                free(blhr_data);
-                fclose(fdi);
-                fclose(fdo);
-                return;
-            }
-            
-            if (myread(fdi, data_z, blhr_data[i].zsize) != 0) {
-                [ProgressIndicator onMainStopAnimation:self];
-                SHOW(@"Failed to read data");
-                free(data_z);
-                free(blhr_data);
-                fclose(fdi);
-                fclose(fdo);
-                return;
-            }
-
-            uif_crypt(ctx, data_z, blhr_data[i].zsize);
-        }
-
-        blhr_data[i].size *= bbis.sectorsz;
-
-        long data_len = blhr_data[i].size;
-        void *data = malloc(data_len);
-        if (!data) {
-            [ProgressIndicator onMainStopAnimation:self];
-            SHOW(@"Failed to allocate memory for uncompressed data");
-            free(data_z);
-            free(blhr_data);
-            fclose(fdi);
-            fclose(fdo);
-            return;
-        }
-
-        switch(blhr_data[i].type) {
-            case 1: {   // non compressed
-                NSLog(@"Uncompressed");
-                if(data_z_len > data_len) {
-                    [ProgressIndicator onMainStopAnimation:self];
-                    SHOW(@"Input is bigger than output");
-                    free(data);
-                    free(data_z);
-                    free(blhr_data);
-                    fclose(fdi);
-                    fclose(fdo);
-                    return;
-                }
-                memcpy(data, data_z, data_z_len);
-                memset(data + data_z_len, 0, data_len - data_z_len); // needed?
-                break;
-            }
-            case 3: {   // multi byte
-                NSLog(@"Multi byte");
-                memset(data, 0, data_len);
-                break;
-            }
-            case 5: {   // compressed
-                NSLog(@"Compressed");
-                if (unzip(z, data_z, data_z_len, data, data_len) == -1) {
-                    [ProgressIndicator onMainStopAnimation:self];
-                    SHOW(@"Failed to uncompress data");
-                    free(data);
-                    free(data_z);
-                    free(blhr_data);
-                    fclose(fdi);
-                    fclose(fdo);
-                    return;
-                }
-                break;
-            }
-            default: {
-                [ProgressIndicator onMainStopAnimation:self];
-                SHOW(@"Unknown type (%d)", blhr_data[i].type);
-                free(data);
-                free(data_z);
-                free(blhr_data);
-                fclose(fdi);
-                fclose(fdo);
-                return;
-            }
-        }
-
-        if(fseek(fdo, blhr_data[i].sector * bbis.sectorsz, SEEK_SET) != 0) {
-            [ProgressIndicator onMainStopAnimation:self];
-            SHOW(@"Failed to seek to output");            
-            free(data);
-            free(data_z);
-            free(blhr_data);
-            fclose(fdi);
-            fclose(fdo);
-            return;
-        }
-        
-        mywrite(fdo, data, data_len);
-        
-        //tot += blhr_data[i].size;
-        
-        free(data);
-        free(data_z);
-    }
-
-
-    [ProgressIndicator onMainStopAnimation:self];
-    [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject: @"Finished successfully" waitUntilDone: FALSE];
-    free(blhr_data);
-    fclose(fdi);
-    fclose(fdo);
-    return;
-
 }
 
-
-- (void)convert
+- (void) receivedError:(NSString*)s
 {
-    z_stream z;
-
-    z.zalloc = (alloc_func)0;
-    z.zfree  = (free_func)0;
-    z.opaque = (voidpf)0;
-
-    if(inflateInit2(&z, 15)) {
-        NSLog(@"Failed to open zlib");
-        return;
-    }
-
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    [self convertWithZlib:&z];
-    
-    if (error != nil) {
-
-        [StatusField performSelectorOnMainThread: @selector(setStringValue:) withObject:NSLocalizedString(@"Failed", nil) waitUntilDone: FALSE];
-
-        NSLog(@"Showing alert: %@", error);
-
-        NSRunCriticalAlertPanel(
-            NSLocalizedString(@"Conversion failed", nil),
-            [NSString stringWithFormat:error],
-            NSLocalizedString(@"Bummer", nil),
-            nil, nil);
-    }
-    
-    
-    [pool release];
-    
-    inflateEnd(&z);
-    
-    [NSApp requestUserAttention:NSInformationalRequest];
+    NSLog(@"ERR: %@", s);
 }
+
+- (NSString*) readInput
+{
+    return nil;
+}
+
+
 
 - (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType
 {
@@ -510,5 +176,44 @@
 {    
     return YES;
 }
+
+- (void) dealloc
+{
+    [cmd release];
+    
+    [super dealloc];
+}
+
+
+
+/*
+
+UIF2ISO 0.1.6
+by Luigi Auriemma
+e-mail: aluigi@autistici.org
+web:    aluigi.org
+
+- open /Users/tcurdt/Desktop/uif2iso/27 C++ Programming Books.uif
+
+  file size    0000000007ae24e3
+  version      4
+  image type   8
+  padding      0
+  sectors      92602
+  sectors size 2048
+  blhr offset  0000000007ae10d7
+  blhr size    5132
+  hash         d90c8cb1a9a618ba0d6f1576d31afe2c
+  others       00000040 00000000 01 02 02 00 00000000
+
+- enable magiciso_is_shit encryption
+- ISO output image format
+- create /Users/tcurdt/Desktop/uif2iso/27 C++ Programming Books.iso
+- start unpacking:
+  000%
+  100%
+- finished
+
+*/
 
 @end

@@ -19,8 +19,9 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import "TaskCommand.h"
 
-@interface MyDocument : NSDocument
+@interface MyDocument : NSDocument<TaskCommandDelegate>
 {
     IBOutlet NSTextField *SizeField;
     IBOutlet NSTextField *VersionField;
@@ -31,6 +32,8 @@
     IBOutlet NSTextField *StatusField;
 
     IBOutlet NSProgressIndicator *ProgressIndicator;
+
+    TaskCommand *cmd;
     
     NSString *error;
 }
