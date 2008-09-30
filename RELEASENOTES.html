@@ -1,14 +1,13 @@
 <html>
 <body>
     <p>
-	    Fix for reading some variants of UIF files. (Thanks to Tori Paul for following up on this)
-	    Upgraded some internal libraries. Added code to anonymously track the number of installations.
+		This is a major rewrite. Instead of implementing the conversion itself uif2iso4mac is now just
+		wrapping the console application. This is much less hassle to maintain and keep up with the changes.
+		Password protected files are postponed until the next release.
     </p>
     <ul>
-        <li>[FIX] Added support for uncompressed blhrs</li>
-        <li>[CHANGE] Upgraded to latest Sparkle 1.5b4</li>
-        <li>[CHANGE] Upgraded to latest FeedbackReporter 1.1.0</li>
-        <li>[ADD] Send anonymous profile and installation id</li>
+        <li>[FIX] "Failed to unzip BLHR data" by updating to the latest MagicIso changes.</li>
+        <li>[CHANGE] Not using custom code anymore but wrapping the command line tool.</li>
     </ul>
     
 </body>
