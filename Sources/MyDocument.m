@@ -144,6 +144,12 @@
     } else if ([s hasPrefix:@"  hash"]) {
         NSString *sub = [s substringFromIndex:15];
         [HashField setStringValue:sub];
+    } else if ([s hasPrefix:@"Error: "]) {        
+        // Error: the magiciso_is_shit encryption can\'t work on your system
+        // Error: wrong bbis signature (00000000)
+        [ProgressIndicator setDoubleValue:0];
+        [ProgressIndicator stopAnimation:self];
+        [StatusField setStringValue:NSLocalizedString(s, nil)];        
     } else {
         NSLog(@"OUT: [%@]", s);
     }
