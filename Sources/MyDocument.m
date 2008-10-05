@@ -111,6 +111,52 @@
     [cmd execute];
 }
 
+- (NSString*) convertError:(NSString*)s
+{
+        /*
+        Error: wrong bbis signature (%08x)
+        Error: wrong blhr signature (%08x)
+        Error: zlib initialization error
+        Error: input size is bigger than output
+        Error: unknown type (%d)
+        Error: the truncated file is smaller than how much I requested
+        Error: incomplete input file, can't read %u bytes
+        Error: problems during the writing of the output file
+        Error: the input lzma block is too short (%u)
+        Error: the compressed LZMA input is wrong or incomplete (%d)
+        Error: the compressed input is wrong or incomplete        
+        Error: the magiciso_is_shit encryption can't work on your system
+        Error: this executable has been compiled without support for magiciso_is_shit
+        */
+
+        NSArray *errorPrefixes = [NSArray arrayWithObjects:
+            @"Error: wrong bbis signature",
+            @"Error: wrong blhr signature",
+            @"Error: zlib initialization error",
+            @"Error: input size is bigger than output",
+            @"Error: unknown type",
+            @"Error: the truncated file is smaller than how much I requested",
+            @"Error: incomplete input file",
+            @"Error: problems during the writing of the output file",
+            @"Error: the input lzma block is too short",
+            @"Error: the compressed LZMA input is wrong or incomplete",
+            @"Error: the compressed input is wrong or incomplete",
+            @"Error: the magiciso_is_shit encryption can't work on your system",
+            @"Error: this executable has been compiled without support for magiciso_is_shit",
+            nil
+        ];
+        
+        int count = [errorPrefixes count];
+        while(count--) {
+            NSString *errorPrefix = [errorPrefixes objectAtIndex:count];
+            if ([s hasPrefix:errorPrefix]) {
+                return NSLocalizedString(errorPrefix, nil);
+            }
+        }
+
+        return NSLocalizedString(@"unknown error", nil);
+}
+
 - (void) receivedOutput:(NSString*)s
 {
     if ([s hasSuffix:@"%\r"]) {
@@ -144,12 +190,12 @@
     } else if ([s hasPrefix:@"  hash"]) {
         NSString *sub = [s substringFromIndex:15];
         [HashField setStringValue:sub];
-    } else if ([s hasPrefix:@"Error: "]) {        
-        // Error: the magiciso_is_shit encryption can\'t work on your system
-        // Error: wrong bbis signature (00000000)
+    } else if ([s hasPrefix:@"Error: "]) {       
+        NSLog(@"OUT: [%@]", s);
+
         [ProgressIndicator setDoubleValue:0];
         [ProgressIndicator stopAnimation:self];
-        [StatusField setStringValue:NSLocalizedString(s, nil)];        
+        [StatusField setStringValue:[self convertError:s]];        
     } else {
         NSLog(@"OUT: [%@]", s);
     }

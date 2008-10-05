@@ -10,6 +10,7 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9D04AF970D99CFAF00D5E1C3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9D7259600D99CD1800326CAF /* Sparkle.framework */; };
 		9D1B50E40E8FE9F3005C260E /* TaskCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1B50E30E8FE9F3005C260E /* TaskCommand.m */; };
+		9D48FC290E99071B00332617 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9D48FC280E99071B00332617 /* Localizable.strings */; };
 		9D5D59040E36706B00E46126 /* NSProgressIndicator+Thread.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */; };
 		9D7259440D99CC7B00326CAF /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593E0D99CC7B00326CAF /* AppController.m */; };
 		9D7259450D99CC7B00326CAF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593F0D99CC7B00326CAF /* main.m */; };
@@ -46,6 +47,7 @@
 		8D15AC370486D014006FF6A4 /* uif2iso4mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uif2iso4mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D1B50E20E8FE9F3005C260E /* TaskCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TaskCommand.h; path = Sources/TaskCommand.h; sourceTree = "<group>"; };
 		9D1B50E30E8FE9F3005C260E /* TaskCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TaskCommand.m; path = Sources/TaskCommand.m; sourceTree = "<group>"; };
+		9D48FC260E99071100332617 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9D5D59020E36706B00E46126 /* NSProgressIndicator+Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSProgressIndicator+Thread.h"; path = "Sources/NSProgressIndicator+Thread.h"; sourceTree = "<group>"; };
 		9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSProgressIndicator+Thread.m"; path = "Sources/NSProgressIndicator+Thread.m"; sourceTree = "<group>"; };
 		9D72593D0D99CC7B00326CAF /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = Sources/AppController.h; sourceTree = SOURCE_ROOT; };
@@ -147,6 +149,7 @@
 				9D8E2CC90E4F2A03001CDF63 /* MainMenu.nib */,
 				9D8E2CCB0E4F2A0E001CDF63 /* MyDocument.nib */,
 				9D8E2CBF0E4F29D1001CDF63 /* Info.plist */,
+				9D48FC280E99071B00332617 /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -211,6 +214,7 @@
 				9D8E2CCC0E4F2A0E001CDF63 /* MyDocument.nib in Resources */,
 				9D8E2CC50E4F29DF001CDF63 /* App.icns in Resources */,
 				9DB56B320E905B680044BC4B /* uif2iso in Resources */,
+				9D48FC290E99071B00332617 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +236,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		9D48FC280E99071B00332617 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9D48FC260E99071100332617 /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		9D8E2CC70E4F29EF001CDF63 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
