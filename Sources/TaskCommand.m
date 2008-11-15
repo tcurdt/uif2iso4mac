@@ -151,24 +151,11 @@
     [errHandle waitForDataInBackgroundAndNotify];
 
 	[task launch];
-/*
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    while(!terminated) {
-        if (![[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:100000]]) {
-            break;
-        }
-        [pool release];
-        pool = [[NSAutoreleasePool alloc] init];
-    }
-    [pool release];
+}
 
-    [self receiveDataFrom:outHandle to:outputBuffer with:@selector(receivedOutput:)];
-    [self receiveDataFrom:errHandle to:errorBuffer with:@selector(receivedError:)];
-
-	int result = [task terminationStatus];
-
-	return result;
-    */
+-(void)abort
+{
+    [task terminate];
 }
 
 -(void)dealloc

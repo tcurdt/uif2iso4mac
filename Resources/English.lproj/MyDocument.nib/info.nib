@@ -4,6 +4,8 @@
 <dict>
 	<key>IBFramework Version</key>
 	<string>672</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../uif2iso4mac.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>

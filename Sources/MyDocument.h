@@ -36,4 +36,6 @@
     NSString *error;
 }
 
+- (IBAction) abort;
+
 @end

@@ -111,6 +111,12 @@
     [cmd execute];
 }
 
+- (IBAction) abort
+{
+    NSLog(@"aborting");
+    [cmd abort];
+}
+
 - (NSString*) convertError:(NSString*)s
 {
         /*
@@ -166,10 +172,14 @@
     } else if ([@"- start unpacking:" isEqualToString:s]) {
         [ProgressIndicator startAnimation:self];
         [ProgressIndicator setMaxValue:100];
+
+        // TODO calculate size and resize the window
         [StatusField setStringValue:NSLocalizedString(@"Converting...", nil)];
     } else if ([@"- finished" isEqualToString:s]) {
         [ProgressIndicator setDoubleValue:100];
         [ProgressIndicator stopAnimation:self];
+
+        // TODO calculate size and resize the window
         [StatusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
     } else if ([s hasPrefix:@"  file size"]) {
         NSString *sub = [s substringFromIndex:15];
@@ -195,6 +205,8 @@
 
         [ProgressIndicator setDoubleValue:0];
         [ProgressIndicator stopAnimation:self];
+        
+        // TODO calculate size and resize the window
         [StatusField setStringValue:[self convertError:s]];        
     } else {
         NSLog(@"OUT: [%@]", s);

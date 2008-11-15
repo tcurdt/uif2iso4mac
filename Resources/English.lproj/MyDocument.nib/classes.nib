@@ -6,6 +6,14 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>MyDocument</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -38,14 +46,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
