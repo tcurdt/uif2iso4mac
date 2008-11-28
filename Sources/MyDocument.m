@@ -33,6 +33,9 @@
         NSLog(@"Using executable %@", executable);
         
         cmd = [[TaskCommand alloc] initWithPath:executable];
+        
+        aborting = NO;
+        done = NO;
     }
     return self;
 }
@@ -46,16 +49,16 @@
 {
     [super windowControllerDidLoadNib:aController];
     
-    [SizeField setStringValue:@""];
-    [VersionField setStringValue:@""];
-    [ImageTypeField setStringValue:@""];
-    [HashField setStringValue:@""];
-    [StatusField setStringValue:@""];
+    [sizeField setStringValue:@""];
+    [versionField setStringValue:@""];
+    [imageTypeField setStringValue:@""];
+    [hashField setStringValue:@""];
+    [statusField setStringValue:@""];
 
-    [ProgressIndicator setDoubleValue:0.0];
+    [progressIndicator setDoubleValue:0.0];
 
     NSString *sourceName = [self fileName];
-    NSString *targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
+    targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
     
     NSLog(@"Converting from %@ to %@", sourceName, targetName);
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -111,10 +114,18 @@
     [cmd execute];
 }
 
-- (IBAction) abort
+- (IBAction) abort:(id)sender
 {
-    NSLog(@"aborting");
-    [cmd abort];
+    if (!done) {
+        [abortButton setEnabled:NO];
+        
+        aborting = YES;
+
+        NSLog(@"aborting");
+        [cmd abort];
+    } else {
+        [self close];
+    }
 }
 
 - (NSString*) convertError:(NSString*)s
@@ -168,46 +179,39 @@
     if ([s hasSuffix:@"%\r"]) {
         NSString *sub = [s substringWithRange:NSMakeRange(2,3)];        
         double p = [sub doubleValue];
-        [ProgressIndicator setDoubleValue:p];
+        [progressIndicator setDoubleValue:p];
     } else if ([@"- start unpacking:" isEqualToString:s]) {
-        [ProgressIndicator startAnimation:self];
-        [ProgressIndicator setMaxValue:100];
+        [progressIndicator startAnimation:self];
+        [progressIndicator setMaxValue:100];
 
         // TODO calculate size and resize the window
-        [StatusField setStringValue:NSLocalizedString(@"Converting...", nil)];
+        [statusField setStringValue:NSLocalizedString(@"Converting...", nil)];
     } else if ([@"- finished" isEqualToString:s]) {
-        [ProgressIndicator setDoubleValue:100];
-        [ProgressIndicator stopAnimation:self];
-
-        // TODO calculate size and resize the window
-        [StatusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+        [progressIndicator setDoubleValue:100];
     } else if ([s hasPrefix:@"  file size"]) {
         NSString *sub = [s substringFromIndex:15];
 
         unsigned size;
         if([[NSScanner scannerWithString:sub] scanHexInt: &size]) {
-            [SizeField setIntValue:size];
+            [sizeField setIntValue:size];
         } else {
             NSLog(@"Could not parse size: %@");
         }
 
     } else if ([s hasPrefix:@"  version"]) {
         NSString *sub = [s substringFromIndex:15];
-        [VersionField setStringValue:sub];
+        [versionField setStringValue:sub];
     } else if ([s hasPrefix:@"  image type"]) {
         NSString *sub = [s substringFromIndex:15];
-        [ImageTypeField setStringValue:sub];
+        [imageTypeField setStringValue:sub];
     } else if ([s hasPrefix:@"  hash"]) {
         NSString *sub = [s substringFromIndex:15];
-        [HashField setStringValue:sub];
+        [hashField setStringValue:sub];
     } else if ([s hasPrefix:@"Error: "]) {       
         NSLog(@"OUT: [%@]", s);
 
-        [ProgressIndicator setDoubleValue:0];
-        [ProgressIndicator stopAnimation:self];
-        
         // TODO calculate size and resize the window
-        [StatusField setStringValue:[self convertError:s]];        
+        [statusField setStringValue:[self convertError:s]];        
     } else {
         NSLog(@"OUT: [%@]", s);
     }
@@ -223,6 +227,32 @@
     return nil;
 }
 
+- (void) terminated
+{
+    [progressIndicator stopAnimation:self];
+
+    [abortButton setTitle:NSLocalizedString(@"Done", nil)];
+    [abortButton setEnabled:YES];
+
+    if (aborting) {
+        // TODO calculate size and resize the window
+        [statusField setStringValue:NSLocalizedString(@"Aborted", nil)];        
+
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+
+        if ([fileManager fileExistsAtPath:targetName]) {
+            NSLog(@"removing incomplete file %@", targetName);
+            [fileManager removeFileAtPath:targetName handler:nil];
+        }
+    } else {
+    
+        // TODO calculate size and resize the window
+        [statusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+    }
+    
+    done = YES;
+}
 
 
 - (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType

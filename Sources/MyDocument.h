@@ -23,19 +23,25 @@
 
 @interface MyDocument : NSDocument<TaskCommandDelegate>
 {
-    IBOutlet NSTextField *SizeField;
-    IBOutlet NSTextField *VersionField;
-    IBOutlet NSTextField *ImageTypeField;
-    IBOutlet NSTextField *HashField;
-    IBOutlet NSTextField *StatusField;
+    IBOutlet NSTextField *sizeField;
+    IBOutlet NSTextField *versionField;
+    IBOutlet NSTextField *imageTypeField;
+    IBOutlet NSTextField *hashField;
+    IBOutlet NSTextField *statusField;
 
-    IBOutlet NSProgressIndicator *ProgressIndicator;
+    IBOutlet NSProgressIndicator *progressIndicator;
+
+    IBOutlet NSButton *abortButton;
 
     TaskCommand *cmd;
     
     NSString *error;
+    
+    NSString *targetName;
+    BOOL aborting;
+    BOOL done;
 }
 
-- (IBAction) abort;
+- (IBAction) abort:(id)sender;
 
 @end

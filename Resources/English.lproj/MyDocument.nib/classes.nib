@@ -5,35 +5,34 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>abort</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>MyDocument</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>HashField</key>
-				<string>NSTextField</string>
-				<key>ImageTypeField</key>
-				<string>NSTextField</string>
-				<key>ProgressIndicator</key>
-				<string>NSProgressIndicator</string>
 				<key>SectorSizeField</key>
 				<string>NSTextField</string>
 				<key>SectorsField</key>
 				<string>NSTextField</string>
-				<key>SizeField</key>
+				<key>abortButton</key>
+				<string>NSButton</string>
+				<key>hashField</key>
 				<string>NSTextField</string>
-				<key>StatusField</key>
+				<key>imageTypeField</key>
 				<string>NSTextField</string>
-				<key>VersionField</key>
+				<key>progressIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>sizeField</key>
+				<string>NSTextField</string>
+				<key>statusField</key>
+				<string>NSTextField</string>
+				<key>versionField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
@@ -46,6 +45,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

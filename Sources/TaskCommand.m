@@ -115,6 +115,9 @@
     [self receiveDataFrom:errHandle to:errorBuffer with:@selector(receivedError:)];
     
     terminated = YES;
+
+    [delegate terminated];
+
 }
 
 - (void) execute

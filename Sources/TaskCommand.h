@@ -24,6 +24,7 @@
 
 - (void) receivedOutput:(NSString*)output;
 - (void) receivedError:(NSString*)error;
+- (void) terminated;
 - (NSString*) readInput;
 
 @end
@@ -50,6 +51,7 @@
 - (id) initWithPath:(NSString*)path;
 - (void) setArgs:(NSArray*)args;
 - (void) execute;
+- (void) abort;
 
 - (id<TaskCommandDelegate>) delegate;
 - (void) setDelegate:(id<TaskCommandDelegate>)delegate;
