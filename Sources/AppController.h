@@ -24,6 +24,7 @@
 {
 }
 
+- (IBAction)showHelp:(id)sender;
 - (IBAction)sendFeedback:(id)sender;
 
 @end

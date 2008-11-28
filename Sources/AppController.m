@@ -83,6 +83,11 @@
     return parameters;
 }
 
+- (IBAction)showHelp:(id)sender
+{
+    NSString *url = @"http://getsatisfaction.com/vaferorg/products/vaferorg_uif2iso4mac";
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:url]];
+}
 
 - (IBAction)sendFeedback:(id)sender
 {
