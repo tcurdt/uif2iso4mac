@@ -21,6 +21,10 @@
 #import <Cocoa/Cocoa.h>
 #import "TaskCommand.h"
 
+#define END_NORMAL  0
+#define END_ABORTED 1
+#define END_ERROR   2
+
 @interface MyDocument : NSDocument<TaskCommandDelegate>
 {
     IBOutlet NSTextField *sizeField;
@@ -38,7 +42,7 @@
     NSString *error;
     
     NSString *targetName;
-    BOOL aborting;
+    int terminationReason;
     BOOL done;
 }
 

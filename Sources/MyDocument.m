@@ -34,7 +34,7 @@
         
         cmd = [[TaskCommand alloc] initWithPath:executable];
         
-        aborting = NO;
+        terminationReason = END_NORMAL;
         done = NO;
     }
     return self;
@@ -119,7 +119,7 @@
     if (!done) {
         [abortButton setEnabled:NO];
         
-        aborting = YES;
+        terminationReason = END_ABORTED;
 
         NSLog(@"aborting");
         [cmd abort];
@@ -174,6 +174,34 @@
         return NSLocalizedString(@"unknown error", nil);
 }
 
+- (BOOL) scan: (NSString*)s  hexLongLong:(unsigned long long*)result
+{
+    unsigned long long r = 0;
+    
+    const char* chars = [[s uppercaseString] cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    for(;;) {
+        char c = *chars++;
+        
+        if (c == 0) break;
+        
+        unsigned int value;
+        
+        if (c >= '0' && c <= '9') {
+            value = c - '0';
+        } else if (c >= 'A' && c <= 'F') {
+            value = c - 'A' + 10;
+        } else {
+            return NO;
+        }
+        
+        r = (r << 4) + value;
+    }
+    
+    *result = r;
+    return YES;
+}
+
 - (void) receivedOutput:(NSString*)s
 {
     if ([s hasSuffix:@"%\r"]) {
@@ -191,9 +219,9 @@
     } else if ([s hasPrefix:@"  file size"]) {
         NSString *sub = [s substringFromIndex:15];
 
-        unsigned size;
-        if([[NSScanner scannerWithString:sub] scanHexInt: &size]) {
-            [sizeField setIntValue:size];
+        unsigned long long size;
+        if([self scan: sub hexLongLong: &size]) {
+            [sizeField setStringValue:[NSString stringWithFormat:@"%lu", size]];
         } else {
             NSLog(@"Could not parse size: %@");
         }
@@ -211,7 +239,10 @@
         NSLog(@"OUT: [%@]", s);
 
         // TODO calculate size and resize the window
-        [statusField setStringValue:[self convertError:s]];        
+        [statusField setStringValue:[self convertError:s]];
+
+        terminationReason = END_ERROR;
+        
     } else {
         NSLog(@"OUT: [%@]", s);
     }
@@ -234,21 +265,24 @@
     [abortButton setTitle:NSLocalizedString(@"Done", nil)];
     [abortButton setEnabled:YES];
 
-    if (aborting) {
-        // TODO calculate size and resize the window
-        [statusField setStringValue:NSLocalizedString(@"Aborted", nil)];        
+    switch (terminationReason) {
+        case END_NORMAL:
+            // TODO calculate size and resize the window
+            [statusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+            break;
+        case END_ABORTED:
+            // TODO calculate size and resize the window
+            [statusField setStringValue:NSLocalizedString(@"Aborted", nil)];        
 
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
+            NSFileManager *fileManager = [NSFileManager defaultManager];
 
-        if ([fileManager fileExistsAtPath:targetName]) {
-            NSLog(@"removing incomplete file %@", targetName);
-            [fileManager removeFileAtPath:targetName handler:nil];
-        }
-    } else {
-    
-        // TODO calculate size and resize the window
-        [statusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+            if ([fileManager fileExistsAtPath:targetName]) {
+                NSLog(@"removing incomplete file %@", targetName);
+                [fileManager removeFileAtPath:targetName handler:nil];
+            }
+            break;
+        case END_ERROR:
+            break;
     }
     
     done = YES;
