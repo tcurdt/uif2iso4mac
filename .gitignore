@@ -1,4 +1,4 @@
-/build
+build/*
 .DS_Store
 *~.nib
 *.mode1v3
@@ -7,3 +7,4 @@
 *.pbxuser
 *.perspective
 *.perspectivev3
+*.pbxproj -crlf -diff -merge
