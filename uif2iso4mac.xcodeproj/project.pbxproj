@@ -20,6 +20,7 @@
 		9D8E2CC80E4F29EF001CDF63 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9D8E2CC70E4F29EF001CDF63 /* Credits.rtf */; };
 		9D8E2CCA0E4F2A03001CDF63 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9D8E2CC90E4F2A03001CDF63 /* MainMenu.nib */; };
 		9D8E2CCC0E4F2A0E001CDF63 /* MyDocument.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9D8E2CCB0E4F2A0E001CDF63 /* MyDocument.nib */; };
+		9DA6EF7D0F44E54A0012C4AC /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 9DA6EF7C0F44E54A0012C4AC /* dsa_pub.pem */; };
 		9DB56B320E905B680044BC4B /* uif2iso in Resources */ = {isa = PBXBuildFile; fileRef = 9DB56B310E905B680044BC4B /* uif2iso */; };
 		9DF81ED70DEAC40600F2EA54 /* FeedbackReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DF81ED60DEAC40600F2EA54 /* FeedbackReporter.framework */; };
 		9DF81EDC0DEAC40F00F2EA54 /* FeedbackReporter.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9DF81ED60DEAC40600F2EA54 /* FeedbackReporter.framework */; };
@@ -61,6 +62,7 @@
 		9D8E2CBE0E4F29D1001CDF63 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/MyDocument.nib; sourceTree = "<group>"; };
 		9D8E2CBF0E4F29D1001CDF63 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		9D8E2CC40E4F29DF001CDF63 /* App.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = App.icns; path = Resources/Images/App.icns; sourceTree = "<group>"; };
+		9DA6EF7C0F44E54A0012C4AC /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		9DB56B310E905B680044BC4B /* uif2iso */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = uif2iso; path = Resources/uif2iso; sourceTree = SOURCE_ROOT; };
 		9DF81ED60DEAC40600F2EA54 /* FeedbackReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FeedbackReporter.framework; path = Frameworks/FeedbackReporter.framework; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -143,6 +145,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9DA6EF7C0F44E54A0012C4AC /* dsa_pub.pem */,
 				9DB56B310E905B680044BC4B /* uif2iso */,
 				9D8E2CC40E4F29DF001CDF63 /* App.icns */,
 				9D8E2CC70E4F29EF001CDF63 /* Credits.rtf */,
@@ -215,6 +218,7 @@
 				9D8E2CC50E4F29DF001CDF63 /* App.icns in Resources */,
 				9DB56B320E905B680044BC4B /* uif2iso in Resources */,
 				9D48FC290E99071B00332617 /* Localizable.strings in Resources */,
+				9DA6EF7D0F44E54A0012C4AC /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

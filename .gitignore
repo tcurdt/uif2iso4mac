@@ -8,3 +8,5 @@ build/*
 *.perspective
 *.perspectivev3
 *.pbxproj -crlf -diff -merge
+dsa_priv.pem
+*.uif

@@ -57,5 +57,7 @@
 	<true/>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 </dict>
 </plist>
