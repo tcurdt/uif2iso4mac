@@ -68,7 +68,7 @@
     return uuid;
 }
 
-- (NSArray *)feedParametersForHostBundle:(NSBundle *)bundle sendingSystemProfile:(BOOL)sendingProfile
+- (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile
 {
     NSLog(@"Adding parameters to sparkle check");
 
