@@ -109,6 +109,7 @@
 - (void) terminated: (NSNotification *)notification
 {
     NSLog(@"Task terminated");
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [self receiveDataFrom:outHandle to:outputBuffer with:@selector(receivedOutput:)];

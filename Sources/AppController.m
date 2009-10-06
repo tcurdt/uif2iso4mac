@@ -37,9 +37,11 @@
 - (void) awakeFromNib
 {
     [[NSApplication sharedApplication] setDelegate:self];
-
     [[SUUpdater sharedUpdater] setDelegate:self];
- 
+}
+
+- (void) applicationDidFinishLaunching:(NSNotification *)notification
+{ 
     [[FRFeedbackReporter sharedReporter] reportIfCrash];   
 }
 

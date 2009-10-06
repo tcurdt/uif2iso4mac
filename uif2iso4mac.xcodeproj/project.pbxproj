@@ -12,6 +12,7 @@
 		9D1B50E40E8FE9F3005C260E /* TaskCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1B50E30E8FE9F3005C260E /* TaskCommand.m */; };
 		9D48FC290E99071B00332617 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9D48FC280E99071B00332617 /* Localizable.strings */; };
 		9D5D59040E36706B00E46126 /* NSProgressIndicator+Thread.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */; };
+		9D645CF8107C0343007EF379 /* nrg2iso in Resources */ = {isa = PBXBuildFile; fileRef = 9D645CF7107C0343007EF379 /* nrg2iso */; };
 		9D7259440D99CC7B00326CAF /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593E0D99CC7B00326CAF /* AppController.m */; };
 		9D7259450D99CC7B00326CAF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593F0D99CC7B00326CAF /* main.m */; };
 		9D7259460D99CC7B00326CAF /* MyDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7259410D99CC7B00326CAF /* MyDocument.m */; };
@@ -51,6 +52,7 @@
 		9D48FC260E99071100332617 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9D5D59020E36706B00E46126 /* NSProgressIndicator+Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSProgressIndicator+Thread.h"; path = "Sources/NSProgressIndicator+Thread.h"; sourceTree = "<group>"; };
 		9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSProgressIndicator+Thread.m"; path = "Sources/NSProgressIndicator+Thread.m"; sourceTree = "<group>"; };
+		9D645CF7107C0343007EF379 /* nrg2iso */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = nrg2iso; path = Resources/nrg2iso; sourceTree = "<group>"; };
 		9D72593D0D99CC7B00326CAF /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = Sources/AppController.h; sourceTree = SOURCE_ROOT; };
 		9D72593E0D99CC7B00326CAF /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppController.m; path = Sources/AppController.m; sourceTree = SOURCE_ROOT; };
 		9D72593F0D99CC7B00326CAF /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Sources/main.m; sourceTree = "<group>"; };
@@ -63,7 +65,7 @@
 		9D8E2CBF0E4F29D1001CDF63 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		9D8E2CC40E4F29DF001CDF63 /* App.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = App.icns; path = Resources/Images/App.icns; sourceTree = "<group>"; };
 		9DA6EF7C0F44E54A0012C4AC /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
-		9DB56B310E905B680044BC4B /* uif2iso */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = uif2iso; path = Resources/uif2iso; sourceTree = SOURCE_ROOT; };
+		9DB56B310E905B680044BC4B /* uif2iso */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = uif2iso; path = Resources/uif2iso; sourceTree = "<group>"; };
 		9DF81ED60DEAC40600F2EA54 /* FeedbackReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FeedbackReporter.framework; path = Frameworks/FeedbackReporter.framework; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -145,12 +147,11 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9D645CFB107C0372007EF379 /* NIBs */,
+				9D645CFA107C0348007EF379 /* Commands */,
 				9DA6EF7C0F44E54A0012C4AC /* dsa_pub.pem */,
-				9DB56B310E905B680044BC4B /* uif2iso */,
 				9D8E2CC40E4F29DF001CDF63 /* App.icns */,
 				9D8E2CC70E4F29EF001CDF63 /* Credits.rtf */,
-				9D8E2CC90E4F2A03001CDF63 /* MainMenu.nib */,
-				9D8E2CCB0E4F2A0E001CDF63 /* MyDocument.nib */,
 				9D8E2CBF0E4F29D1001CDF63 /* Info.plist */,
 				9D48FC280E99071B00332617 /* Localizable.strings */,
 			);
@@ -166,6 +167,24 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9D645CFA107C0348007EF379 /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				9D645CF7107C0343007EF379 /* nrg2iso */,
+				9DB56B310E905B680044BC4B /* uif2iso */,
+			);
+			name = Commands;
+			sourceTree = "<group>";
+		};
+		9D645CFB107C0372007EF379 /* NIBs */ = {
+			isa = PBXGroup;
+			children = (
+				9D8E2CC90E4F2A03001CDF63 /* MainMenu.nib */,
+				9D8E2CCB0E4F2A0E001CDF63 /* MyDocument.nib */,
+			);
+			name = NIBs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,6 +238,7 @@
 				9DB56B320E905B680044BC4B /* uif2iso in Resources */,
 				9D48FC290E99071B00332617 /* Localizable.strings in Resources */,
 				9DA6EF7D0F44E54A0012C4AC /* dsa_pub.pem in Resources */,
+				9D645CF8107C0343007EF379 /* nrg2iso in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,7 +298,7 @@
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -307,7 +327,7 @@
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
@@ -341,7 +361,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.4;
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -352,7 +372,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.4;
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};

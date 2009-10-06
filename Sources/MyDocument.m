@@ -58,6 +58,23 @@
     [progressIndicator setDoubleValue:0.0];
 
     NSString *sourceName = [self fileName];
+
+    NSOpenPanel *targetDialog = [NSOpenPanel openPanel];
+    [targetDialog setCanChooseFiles:YES];
+    [targetDialog setCanChooseDirectories:YES];
+
+    if ([targetDialog runModalForDirectory:[sourceName stringByDeletingLastPathComponent] file:sourceName] != NSOKButton) {
+        return;
+    }
+    
+    
+    NSArray *files = [targetDialog filenames];
+    int i;
+    for(i = 0; i < [files count]; i++ ) {
+        NSString *fileName = [files objectAtIndex:i];
+        NSLog(@"selected = %@", fileName);
+    }
+
     targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
     
     NSLog(@"Converting from %@ to %@", sourceName, targetName);
