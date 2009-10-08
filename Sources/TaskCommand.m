@@ -119,6 +119,7 @@
 
     [delegate terminated];
 
+    [delegate release], delegate = nil;
 }
 
 - (void) execute
@@ -164,14 +165,14 @@
 
 -(void)dealloc
 {
-    [delegate release];
-    [args release];
-    [path release];
+    [delegate release], delegate = nil;
+    [args release], args = nil;
+    [path release], path = nil;
 
-    [outputBuffer release];
-    [errorBuffer release];
+    [outputBuffer release], outputBuffer = nil;
+    [errorBuffer release], errorBuffer = nil;
 
-    [task release];
+    [task release], task = nil;
 
     [super dealloc];
 }

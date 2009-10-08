@@ -57,23 +57,26 @@
 
     [progressIndicator setDoubleValue:0.0];
 
+}
+
+- (void) showWindows
+{
+
     NSString *sourceName = [self fileName];
 
-    NSOpenPanel *targetDialog = [NSOpenPanel openPanel];
-    [targetDialog setCanChooseFiles:YES];
-    [targetDialog setCanChooseDirectories:YES];
-
-    if ([targetDialog runModalForDirectory:[sourceName stringByDeletingLastPathComponent] file:sourceName] != NSOKButton) {
-        return;
-    }
-    
-    
-    NSArray *files = [targetDialog filenames];
-    int i;
-    for(i = 0; i < [files count]; i++ ) {
-        NSString *fileName = [files objectAtIndex:i];
-        NSLog(@"selected = %@", fileName);
-    }
+//    NSOpenPanel *targetDialog = [NSOpenPanel openPanel];
+//    [targetDialog setCanChooseFiles:YES];
+//    [targetDialog setCanChooseDirectories:YES];
+//
+//    if ([targetDialog runModalForDirectory:[sourceName stringByDeletingLastPathComponent] file:sourceName] != NSOKButton) {
+//        return;
+//    }
+//    NSArray *files = [targetDialog filenames];
+//    int i;
+//    for(i = 0; i < [files count]; i++ ) {
+//        NSString *fileName = [files objectAtIndex:i];
+//        NSLog(@"selected = %@", fileName);
+//    }
 
     targetName = [[sourceName stringByDeletingPathExtension] stringByAppendingPathExtension:@"iso"];
     
@@ -120,6 +123,22 @@
         
         [fileManager removeFileAtPath:targetName handler:nil];
     }
+
+    NSString *dir = [targetName stringByDeletingLastPathComponent];
+    if (![fileManager isWritableFileAtPath:dir]) {
+
+        NSRunCriticalAlertPanel(
+            NSLocalizedString(@"Target not writeable", nil),
+            [NSString stringWithFormat:NSLocalizedString(@"Cannot write to directory.\n'%@'", nil), dir],
+            NSLocalizedString(@"Bummer", nil),
+            nil, nil);
+
+        NSLog(@"Target directory not writeable");
+        [self close];
+        return;
+    }
+
+    [super showWindows];
 
     NSLog(@"Converting %@ -> %@", sourceName, targetName);
     
