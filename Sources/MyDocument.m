@@ -155,9 +155,8 @@
     if (!done) {
         [abortButton setEnabled:NO];
         
-        terminationReason = END_ABORTED;
-
         NSLog(@"aborting");
+        terminationReason = END_ABORTED;
         [cmd abort];
     } else {
         [self close];
@@ -248,7 +247,6 @@
         [progressIndicator startAnimation:self];
         [progressIndicator setMaxValue:100];
 
-        // TODO calculate size and resize the window
         [statusField setStringValue:NSLocalizedString(@"Converting...", nil)];
     } else if ([@"- finished" isEqualToString:s]) {
         [progressIndicator setDoubleValue:100];
@@ -262,6 +260,20 @@
             NSLog(@"Could not parse size: %@");
         }
 
+    } else if ([s hasPrefix:@"- ISO"]) {
+        // type iso
+    } else if ([s hasPrefix:@"- NRG"]) {
+        // type nrg
+        [statusField setStringValue:NSLocalizedString(@"UIF containing NRG not supported yet", nil)];
+        terminationReason = END_ERROR;
+        [cmd abort];
+    } else if ([s hasPrefix:@"- BIN/CUE"]) {
+        // type bin
+        [statusField setStringValue:NSLocalizedString(@"UIF containing BIN/CUE not supported yet", nil)];
+        terminationReason = END_ERROR;
+        [cmd abort];
+    } else if ([s hasPrefix:@"- create"]) {
+        // real filename
     } else if ([s hasPrefix:@"  version"]) {
         NSString *sub = [s substringFromIndex:15];
         [versionField setStringValue:sub];
@@ -274,7 +286,6 @@
     } else if ([s hasPrefix:@"Error: "]) {       
         NSLog(@"OUT: [%@]", s);
 
-        // TODO calculate size and resize the window
         [statusField setStringValue:[self convertError:s]];
 
         terminationReason = END_ERROR;
@@ -301,13 +312,19 @@
     [abortButton setTitle:NSLocalizedString(@"Done", nil)];
     [abortButton setEnabled:YES];
 
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
     switch (terminationReason) {
         case END_NORMAL:
-            // TODO calculate size and resize the window
-            [statusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+
+            if ([fileManager fileExistsAtPath:targetName]) {
+                [statusField setStringValue:NSLocalizedString(@"Finished successfully", nil)];
+            } else {
+                [statusField setStringValue:NSLocalizedString(@"Failed to extract ISO", nil)];
+            }
+
             break;
         case END_ABORTED:
-            // TODO calculate size and resize the window
             [statusField setStringValue:NSLocalizedString(@"Aborted", nil)];        
 
             NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -347,37 +364,5 @@
     
     [super dealloc];
 }
-
-
-
-/*
-
-UIF2ISO 0.1.6
-by Luigi Auriemma
-e-mail: aluigi@autistici.org
-web:    aluigi.org
-
-- open /Users/tcurdt/Desktop/uif2iso/Test.uif
-
-  file size    0000000007af24e3
-  version      4
-  image type   8
-  padding      0
-  sectors      92602
-  sectors size 2048
-  blhr offset  0000000007af10d7
-  blhr size    5132
-  hash         d90c7cb1a9a418ba0d6f1576d31afe2c
-  others       00000040 00000000 01 02 02 00 00000000
-
-- enable magiciso_is_shit encryption
-- ISO output image format
-- create /Users/tcurdt/Desktop/uif2iso/Test.iso
-- start unpacking:
-  000%
-  100%
-- finished
-
-*/
 
 @end
