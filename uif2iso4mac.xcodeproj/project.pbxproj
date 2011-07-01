@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		9D04AF970D99CFAF00D5E1C3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9D7259600D99CD1800326CAF /* Sparkle.framework */; };
+		9D097E1313BE8A59003C4FBA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9D097E1113BE8A59003C4FBA /* Localizable.strings */; };
 		9D1B50E40E8FE9F3005C260E /* TaskCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1B50E30E8FE9F3005C260E /* TaskCommand.m */; };
-		9D48FC290E99071B00332617 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9D48FC280E99071B00332617 /* Localizable.strings */; };
 		9D5D59040E36706B00E46126 /* NSProgressIndicator+Thread.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */; };
 		9D645CF8107C0343007EF379 /* nrg2iso in Resources */ = {isa = PBXBuildFile; fileRef = 9D645CF7107C0343007EF379 /* nrg2iso */; };
 		9D7259440D99CC7B00326CAF /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D72593E0D99CC7B00326CAF /* AppController.m */; };
@@ -47,9 +47,9 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D15AC370486D014006FF6A4 /* uif2iso4mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = uif2iso4mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D097E1213BE8A59003C4FBA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9D1B50E20E8FE9F3005C260E /* TaskCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TaskCommand.h; path = Sources/TaskCommand.h; sourceTree = "<group>"; };
 		9D1B50E30E8FE9F3005C260E /* TaskCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TaskCommand.m; path = Sources/TaskCommand.m; sourceTree = "<group>"; };
-		9D48FC260E99071100332617 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9D5D59020E36706B00E46126 /* NSProgressIndicator+Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSProgressIndicator+Thread.h"; path = "Sources/NSProgressIndicator+Thread.h"; sourceTree = "<group>"; };
 		9D5D59030E36706B00E46126 /* NSProgressIndicator+Thread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSProgressIndicator+Thread.m"; path = "Sources/NSProgressIndicator+Thread.m"; sourceTree = "<group>"; };
 		9D645CF7107C0343007EF379 /* nrg2iso */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = nrg2iso; path = Resources/nrg2iso; sourceTree = "<group>"; };
@@ -153,7 +153,7 @@
 				9D8E2CC40E4F29DF001CDF63 /* App.icns */,
 				9D8E2CC70E4F29EF001CDF63 /* Credits.rtf */,
 				9D8E2CBF0E4F29D1001CDF63 /* Info.plist */,
-				9D48FC280E99071B00332617 /* Localizable.strings */,
+				9D097E1113BE8A59003C4FBA /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -216,7 +216,12 @@
 			isa = PBXProject;
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "uif2iso4mac" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+				English,
+			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* uif2iso */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -236,9 +241,9 @@
 				9D8E2CCC0E4F2A0E001CDF63 /* MyDocument.nib in Resources */,
 				9D8E2CC50E4F29DF001CDF63 /* App.icns in Resources */,
 				9DB56B320E905B680044BC4B /* uif2iso in Resources */,
-				9D48FC290E99071B00332617 /* Localizable.strings in Resources */,
 				9DA6EF7D0F44E54A0012C4AC /* dsa_pub.pem in Resources */,
 				9D645CF8107C0343007EF379 /* nrg2iso in Resources */,
+				9D097E1313BE8A59003C4FBA /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,10 +265,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		9D48FC280E99071B00332617 /* Localizable.strings */ = {
+		9D097E1113BE8A59003C4FBA /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9D48FC260E99071100332617 /* English */,
+				9D097E1213BE8A59003C4FBA /* English */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -361,7 +366,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -372,7 +377,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};

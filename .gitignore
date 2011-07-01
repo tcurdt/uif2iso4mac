@@ -1,5 +1,5 @@
-research/*
-build/*
+/build
+/Research
 .DS_Store
 *~.nib
 *.mode1v3
@@ -8,6 +8,7 @@ build/*
 *.pbxuser
 *.perspective
 *.perspectivev3
-*.pbxproj -crlf -diff -merge
+*.xcworkspace
+xcuserdata
 dsa_priv.pem
-*.uif
+test.uif

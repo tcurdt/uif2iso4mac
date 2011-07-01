@@ -62,7 +62,7 @@
 - (void) showWindows
 {
 
-    NSString *sourceName = [self fileName];
+    NSString *sourceName = [[self fileURL] absoluteString];
 
 //    NSOpenPanel *targetDialog = [NSOpenPanel openPanel];
 //    [targetDialog setCanChooseFiles:YES];
@@ -121,7 +121,7 @@
             return;
         }
         
-        [fileManager removeFileAtPath:targetName handler:nil];
+        [fileManager removeItemAtPath:targetName error:nil];
     }
 
     NSString *dir = [targetName stringByDeletingLastPathComponent];
@@ -257,7 +257,7 @@
         if([self scan: sub hexLongLong: &size]) {
             [sizeField setStringValue:[NSString stringWithFormat:@"%lu", size]];
         } else {
-            NSLog(@"Could not parse size: %@");
+            NSLog(@"Could not parse size: %@", sub);
         }
 
     } else if ([s hasPrefix:@"- ISO"]) {
@@ -331,7 +331,7 @@
 
             if ([fileManager fileExistsAtPath:targetName]) {
                 NSLog(@"removing incomplete file %@", targetName);
-                [fileManager removeFileAtPath:targetName handler:nil];
+                [fileManager removeItemAtPath:targetName error:nil];
             }
             break;
         case END_ERROR:
@@ -344,7 +344,7 @@
 
 - (BOOL)readFromFile:(NSString *)fileName ofType:(NSString *)docType
 {
-    [self setFileName:fileName];
+    [self setFileURL:[NSURL fileURLWithPath:fileName]];
     return YES;
 }
 
