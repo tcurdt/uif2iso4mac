@@ -255,7 +255,7 @@
 
         unsigned long long size;
         if([self scan: sub hexLongLong: &size]) {
-            [sizeField setStringValue:[NSString stringWithFormat:@"%lu", size]];
+            [sizeField setStringValue:[NSString stringWithFormat:@"%llu", size]];
         } else {
             NSLog(@"Could not parse size: %@", sub);
         }

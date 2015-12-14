@@ -31,12 +31,10 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.5.0</string>
 	<key>CFBundleIconFile</key>
 	<string>App</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.vafer.uif2iso4mac</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -47,19 +45,23 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>9.9.9</string>
+	<key>FRFeedbackReporter.targetURL</key>
+	<string>http://localhost/feedback/submit.php?project=%@</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>FRExceptionReportingApplication</string>
-	<key>FRFeedbackReporter.targetURL</key>
-	<string>http://vafer.org/feedback/submit.php?project=%@</string>
-	<key>SUFeedURL</key>
-	<string>http://vafer.org/projects/uif2iso4mac/appcast.xml</string>
-	<key>SUSendProfileInfo</key>
-	<true/>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
+	<key>SUFeedURL</key>
+	<string>http://localhost/projects/uif2iso4mac/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUSendProfileInfo</key>
+	<true/>
 </dict>
 </plist>
