@@ -62,7 +62,7 @@
 - (void) showWindows
 {
 
-    NSString *sourceName = [[self fileURL] absoluteString];
+    NSString *sourceName = [[self fileURL] path];
 
 //    NSOpenPanel *targetDialog = [NSOpenPanel openPanel];
 //    [targetDialog setCanChooseFiles:YES];
